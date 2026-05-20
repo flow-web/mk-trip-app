@@ -1,13 +1,14 @@
 'use client'
 
 import { useLiveQuery } from 'dexie-react-hooks'
-import { CalendarPlus, MapPin, Plus, Receipt } from 'lucide-react'
 import { db } from '@/lib/db'
 import { accentFor } from '@/lib/design/accent'
 import { defaultHeroFor } from '@/lib/design/hero'
 import { Hero } from '@/components/design/Hero'
 import { TripSwitcher } from '@/components/design/TripSwitcher'
 import { UpcomingCarousel } from '@/components/home/UpcomingCarousel'
+import { CrewStats } from '@/components/home/CrewStats'
+import { QuickActions } from '@/components/home/QuickActions'
 import type { Database } from '@/lib/supabase/types'
 
 type Trip = Database['public']['Tables']['trips']['Row']
@@ -138,49 +139,8 @@ export function HomeClient({
         recentExpense={recentExpense}
         remainingCount={remainingCount}
       />
-      <section className="px-5 mt-8">
-        <div className="mk-eyebrow text-ink-mute">LE CREW EN CHIFFRES</div>
-        <div className="mt-3 bg-white rounded-md border border-hairline overflow-hidden">
-          {stats.map((s, i) => (
-            <div
-              key={s.label}
-              className={`flex items-baseline justify-between px-4 py-3.5 ${
-                i ? 'border-t border-hairline' : ''
-              }`}
-            >
-              <div className="text-sm text-ink-soft">{s.label}</div>
-              <div className="flex items-baseline gap-1">
-                <div className="mk-display text-2xl">{s.val}</div>
-                {s.unit && <div className="mk-mono text-xs text-ink-mute">{s.unit}</div>}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-      <section className="px-5 mt-6 mb-6">
-        <div className="grid grid-cols-3 gap-2">
-          {[
-            { Icon: Receipt, label: 'Dépense', href: `/trips/${tripId}/budget?new=1` },
-            { Icon: MapPin, label: 'Spot', href: `/trips/${tripId}/map?new=1` },
-            { Icon: CalendarPlus, label: 'Jour', href: `/trips/${tripId}/planning?new=1` },
-          ].map(({ Icon, label, href }) => (
-            <a
-              key={label}
-              href={href}
-              className="bg-white rounded-md border border-hairline p-3 flex flex-col gap-1.5 relative"
-            >
-              <div className="w-7 h-7 bg-paper rounded-xs flex items-center justify-center">
-                <Icon className="w-4 h-4 text-ink" strokeWidth={1.75} />
-              </div>
-              <div className="text-sm font-medium">{label}</div>
-              <Plus
-                className="absolute top-3 right-3 w-3.5 h-3.5 text-ink-mute"
-                strokeWidth={2}
-              />
-            </a>
-          ))}
-        </div>
-      </section>
+      <CrewStats stats={stats} />
+      <QuickActions tripId={tripId} />
     </main>
   )
 }
