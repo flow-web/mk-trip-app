@@ -42,6 +42,8 @@ export type Database = {
           total_budget: number | null
           cover_color: string
           join_code: string
+          hero_image_url: string | null
+          hero_image_uploaded: boolean
           created_at: string
           updated_at: string
         }
@@ -57,6 +59,8 @@ export type Database = {
           total_budget?: number | null
           cover_color?: string
           join_code?: string
+          hero_image_url?: string | null
+          hero_image_uploaded?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -72,6 +76,8 @@ export type Database = {
           total_budget?: number | null
           cover_color?: string
           join_code?: string
+          hero_image_url?: string | null
+          hero_image_uploaded?: boolean
           created_at?: string
           updated_at?: string
         }
