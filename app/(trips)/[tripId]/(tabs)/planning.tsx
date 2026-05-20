@@ -16,10 +16,10 @@ import {
   Zap,
   CheckCircle2,
 } from "lucide-react-native";
-import { TRIP_DAYS, TripDay, PlannedActivity } from "../../components/PlanningData";
-import { usePlanning } from "../../components/PlanningStore";
-import { SpotCategory } from "../../components/MapData";
-import FloatingDock from "../../components/FloatingDock";
+import { TRIP_DAYS, TripDay, PlannedActivity } from "../../../../components/PlanningData";
+import { usePlanning } from "../../../../components/PlanningStore";
+import { SpotCategory } from "../../../../components/MapData";
+import FloatingDock from "../../../../components/FloatingDock";
 
 // ─── Category config ─────────────────────────────────────────────────────────
 

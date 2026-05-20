@@ -16,15 +16,15 @@ import {
   Zap,
   MapPin,
 } from "lucide-react-native";
-import FloatingDock from "../../components/FloatingDock";
-import SpotCard from "../../components/SpotCard";
+import FloatingDock from "../../../../components/FloatingDock";
+import SpotCard from "../../../../components/SpotCard";
 import {
   SPOTS,
   ZONES,
   CATEGORY_CONFIG,
   type Spot,
   type SpotCategory,
-} from "../../components/MapData";
+} from "../../../../components/MapData";
 
 // ─── Dark map style ───────────────────────────────────────────────────────────
 const DARK_MAP_STYLE = [

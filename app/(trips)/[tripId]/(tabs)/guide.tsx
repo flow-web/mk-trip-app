@@ -13,7 +13,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   isEnabled as notifIsEnabled,
   setEnabled as notifSetEnabled,
-} from "../../components/NotificationService";
+} from "../../../../components/NotificationService";
 import {
   Pressable,
   ScrollView,
@@ -22,7 +22,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import FloatingDock from "../../components/FloatingDock";
+import FloatingDock from "../../../../components/FloatingDock";
 
 const CHECKLIST_KEY = "mk_trip_checklist";
 

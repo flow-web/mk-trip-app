@@ -1,10 +1,10 @@
 import { View, ScrollView, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CountdownCard from "../../components/CountdownCard";
-import TimelineScroll from "../../components/TimelineScroll";
-import FloatingDock from "../../components/FloatingDock";
-import { useBudget } from "../../components/BudgetStore";
-import AnimatedEntry from "../../components/AnimatedEntry";
+import CountdownCard from "../../../../components/CountdownCard";
+import TimelineScroll from "../../../../components/TimelineScroll";
+import FloatingDock from "../../../../components/FloatingDock";
+import { useBudget } from "../../../../components/BudgetStore";
+import AnimatedEntry from "../../../../components/AnimatedEntry";
 
 export default function Dashboard() {
   const { totalBudget, totalSpent, remaining } = useBudget();

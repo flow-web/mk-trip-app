@@ -18,8 +18,8 @@ import {
   HelpCircle,
   Trash2,
 } from "lucide-react-native";
-import FloatingDock from "../../components/FloatingDock";
-import { useBudget, ExpenseCategory, Expense } from "../../components/BudgetStore";
+import FloatingDock from "../../../../components/FloatingDock";
+import { useBudget, ExpenseCategory, Expense } from "../../../../components/BudgetStore";
 
 // ─── Category config ──────────────────────────────────────────────────────────
 
