@@ -1,16 +1,26 @@
 import { View, Text, ImageBackground } from "react-native";
-import { Cloud, Sun } from "lucide-react-native";
-
-const TRIP_DATE = new Date("2026-04-10");
-
-function getDaysUntil(): number {
-  const now = new Date();
-  const diff = TRIP_DATE.getTime() - now.getTime();
-  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-}
+import { Sun } from "lucide-react-native";
+import { use$ } from "@legendapp/state/react";
+import { trips$ } from "../store/trips$";
+import { currentTripId$ } from "../store/currentTrip$";
 
 export default function CountdownCard() {
-  const days = getDaysUntil();
+  const tripId = use$(currentTripId$);
+  const trip = use$((trips$ as any)[tripId ?? "_"]);
+
+  const destination = trip?.destination ?? "Voyage";
+  const startDate = trip?.start_date ? new Date(trip.start_date) : null;
+  const now = new Date();
+  const daysUntil = startDate
+    ? Math.max(0, Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)))
+    : 0;
+
+  const dateLabel = startDate
+    ? startDate.toLocaleString("fr-FR", { month: "long", year: "numeric" })
+    : "";
+  const dateLabelCap = dateLabel
+    ? dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)
+    : "";
 
   return (
     <View className="mx-4 mt-2 rounded-bento overflow-hidden" style={{ height: 220 }}>
@@ -24,10 +34,10 @@ export default function CountdownCard() {
           <View className="flex-row justify-between items-start">
             <View>
               <Text className="text-txt-muted text-xs font-bold tracking-widest uppercase">
-                Lisbonne
+                {destination}
               </Text>
               <Text className="text-txt-main text-lg font-semibold" style={{ letterSpacing: -0.5 }}>
-                Portugal
+                {trip?.country ?? ""}
               </Text>
             </View>
             <View className="flex-row items-center gap-2 bg-black/40 rounded-pill px-3 py-1.5">
@@ -39,11 +49,13 @@ export default function CountdownCard() {
           {/* Bottom: countdown */}
           <View>
             <Text className="text-primary text-6xl font-bold" style={{ letterSpacing: -3 }}>
-              J-{days}
+              J-{daysUntil}
             </Text>
-            <Text className="text-txt-muted text-xs tracking-widest uppercase mt-1">
-              Avril 2026
-            </Text>
+            {dateLabelCap ? (
+              <Text className="text-txt-muted text-xs tracking-widest uppercase mt-1">
+                {dateLabelCap}
+              </Text>
+            ) : null}
           </View>
         </View>
       </ImageBackground>

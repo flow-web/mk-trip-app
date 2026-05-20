@@ -7,9 +7,13 @@ import {
   Hotel,
   Zap,
 } from "lucide-react-native";
-import { TRIP_DAYS } from "./PlanningData";
-import { SpotCategory } from "./MapData";
 import React from "react";
+import { use$ } from "@legendapp/state/react";
+import { days$ } from "../store/days$";
+import { activities$ } from "../store/activities$";
+import { currentTripId$ } from "../store/currentTrip$";
+
+type SpotCategory = "food" | "culture" | "nightlife" | "nature" | "accommodation" | "activity";
 
 const CATEGORY_ICON: Record<SpotCategory, { Icon: React.ComponentType<any>; color: string }> = {
   food:          { Icon: UtensilsCrossed, color: "#FF6B4A" },
@@ -21,23 +25,42 @@ const CATEGORY_ICON: Record<SpotCategory, { Icon: React.ComponentType<any>; colo
 };
 
 export default function TimelineScroll() {
-  // Show Day 1 activities (first 5) — the closest upcoming day
-  const day = TRIP_DAYS[0];
-  const activities = day.activities.slice(0, 5);
+  const tripId = use$(currentTripId$);
+  const days = (Object.values(use$(days$) ?? {}) as any[])
+    .filter((d) => d.trip_id === tripId)
+    .sort((a, b) => a.day_number - b.day_number);
+
+  const allActivities = (Object.values(use$(activities$) ?? {}) as any[]);
+
+  // Show first day's activities (closest upcoming)
+  const day = days[0];
+  const dayActivities = day
+    ? allActivities
+        .filter((a) => a.day_id === day.id)
+        .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+        .slice(0, 5)
+    : [];
+
+  if (!day) return null;
 
   return (
     <View className="mt-5">
       <Text className="text-txt-muted text-[10px] font-bold tracking-widest uppercase mx-4 mb-3">
-        Jour 1 — {day.theme}
+        Jour {day.day_number}{day.theme ? ` — ${day.theme}` : ""}
       </Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}
       >
-        {activities.map((act) => {
-          const cat = CATEGORY_ICON[act.category];
+        {dayActivities.map((act) => {
+          const catKey = (act.category ?? "activity") as SpotCategory;
+          const cat = CATEGORY_ICON[catKey] ?? CATEGORY_ICON["activity"];
           const { Icon, color } = cat;
+
+          const timeLabel = act.time
+            ? String(act.time).slice(0, 5)
+            : "";
 
           return (
             <Pressable
@@ -51,7 +74,7 @@ export default function TimelineScroll() {
               }}
             >
               <Text className="text-txt-muted text-[10px] font-bold tracking-wider mb-2">
-                {act.time}
+                {timeLabel}
               </Text>
               <View
                 className="rounded-2xl items-center justify-center mb-1.5"
