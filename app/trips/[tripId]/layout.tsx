@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/types'
+import { SyncBanner } from '@/components/sync/SyncBanner'
 import { TripBootstrap } from './trip-bootstrap'
 import { BottomTab } from './(nav)/bottom-tab'
 import { SideRail } from './(nav)/side-rail'
@@ -30,6 +31,7 @@ export default async function TripLayout({
       <SideRail tripId={tripId} tripType={trip.trip_type} />
       <div className="flex-1 min-w-0">
         <TripBootstrap tripId={tripId} />
+        <SyncBanner />
         {children}
       </div>
       <BottomTab tripId={tripId} tripType={trip.trip_type} />
