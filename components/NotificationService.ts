@@ -1,6 +1,8 @@
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { TRIP_DAYS } from "./PlanningData";
+import { days$ } from "../store/days$";
+import { activities$ } from "../store/activities$";
+import { currentTripId$ } from "../store/currentTrip$";
 
 const NOTIF_KEY = "mk_trip_notifs_enabled";
 
@@ -48,28 +50,42 @@ export async function setEnabled(enabled: boolean): Promise<boolean> {
   }
 }
 
-/** Schedule morning reminders for each trip day */
+/** Schedule morning reminders for each trip day (current trip only) */
 async function scheduleAll() {
   const mod = await getNotifModule();
   if (!mod) return;
 
-  // Cancel existing first
   await mod.cancelAllScheduledNotificationsAsync();
 
-  for (const day of TRIP_DAYS) {
-    const [year, month, dayNum] = day.date.split("-").map(Number);
-    const triggerDate = new Date(year, month - 1, dayNum, 8, 0, 0); // 8h00 morning
+  const tripId = currentTripId$.peek();
+  if (!tripId) return;
 
-    // Don't schedule past dates
+  const allDays = Object.values((days$ as any).peek() ?? {}) as any[];
+  const allActivities = Object.values((activities$ as any).peek() ?? {}) as any[];
+
+  const tripDays = allDays
+    .filter((d) => d.trip_id === tripId)
+    .sort((a, b) => a.day_number - b.day_number);
+
+  for (const day of tripDays) {
+    if (!day.date) continue;
+    const [year, month, dayNum] = String(day.date).split("-").map(Number);
+    const triggerDate = new Date(year, month - 1, dayNum, 8, 0, 0);
+
     if (triggerDate <= new Date()) continue;
 
-    const firstActivity = day.activities[0];
-    const activityCount = day.activities.length;
+    const dayActs = allActivities
+      .filter((a) => a.day_id === day.id)
+      .sort((a, b) => a.position - b.position);
+    const firstActivity = dayActs[0];
+    const activityCount = dayActs.length;
 
     await mod.scheduleNotificationAsync({
       content: {
-        title: `Jour ${day.dayNumber} — ${day.theme}`,
-        body: `${activityCount} activités aujourd'hui. Première : ${firstActivity.title} à ${firstActivity.time}`,
+        title: `Jour ${day.day_number} — ${day.theme ?? ""}`,
+        body: firstActivity
+          ? `${activityCount} activités aujourd'hui. Première : ${firstActivity.title} à ${String(firstActivity.time ?? "").slice(0, 5)}`
+          : "Programme du jour disponible dans l'app",
         data: { dayId: day.id },
         sound: true,
       },
