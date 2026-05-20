@@ -42,3 +42,9 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Next.js
+.next/
+out/
+.vercel
+next-env.d.ts
