@@ -7,6 +7,7 @@ import { accentFor } from '@/lib/design/accent'
 import { defaultHeroFor } from '@/lib/design/hero'
 import { Hero } from '@/components/design/Hero'
 import { TripSwitcher } from '@/components/design/TripSwitcher'
+import { UpcomingCarousel } from '@/components/home/UpcomingCarousel'
 import type { Database } from '@/lib/supabase/types'
 
 type Trip = Database['public']['Tables']['trips']['Row']
@@ -131,72 +132,12 @@ export function HomeClient({
         }
       />
 
-      <section className="px-5 mt-5">
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <div className="mk-eyebrow text-ink-mute">À VENIR · AUJOURD'HUI</div>
-            <h2 className="font-display font-bold text-xl mt-1">
-              {todayActivities.length > 0
-                ? `Encore ${remainingCount} chose${remainingCount > 1 ? 's' : ''}.`
-                : 'Rien de calé.'}
-            </h2>
-          </div>
-        </div>
-
-        <div className="flex gap-2.5 overflow-x-auto -mx-5 px-5 mk-noscroll">
-          {nextActivity && (
-            <div className="w-[220px] flex-none bg-white rounded-md border border-hairline p-3.5">
-              <div className="flex items-center gap-1.5">
-                <div
-                  className="w-5 h-5 rounded-xs flex items-center justify-center"
-                  style={{ background: accent.base }}
-                >
-                  <span className="text-white text-[10px]">●</span>
-                </div>
-                <div className="mk-mono text-[10px] text-ink-mute">
-                  PROCHAIN · {nextActivity.time?.slice(0, 5) ?? '—'}
-                </div>
-              </div>
-              <div className="font-display font-bold text-lg mt-2.5 leading-tight">
-                {nextActivity.title}
-              </div>
-              <div className="text-xs text-ink-mute mt-0.5">
-                {nextActivity.subtitle ?? '—'}
-              </div>
-            </div>
-          )}
-
-          {recentExpense && (
-            <div className="w-[200px] flex-none bg-ink text-paper rounded-md p-3.5">
-              <div className="mk-mono text-[10px] opacity-60">DERNIÈRE DÉPENSE</div>
-              <div className="mk-display text-3xl mt-3 text-white">
-                {(recentExpense.amount / 100).toFixed(2)} €
-              </div>
-              <div className="text-xs opacity-85 mt-0.5">
-                {recentExpense.note ?? recentExpense.category}
-              </div>
-            </div>
-          )}
-
-          <div
-            className="w-[180px] flex-none rounded-md p-3.5"
-            style={{ background: accent.tint }}
-          >
-            <div className="mk-mono text-[10px]" style={{ color: accent.deep }}>
-              MÉTÉO
-            </div>
-            <div className="mk-display text-3xl mt-3" style={{ color: accent.deep }}>
-              —
-            </div>
-            <div
-              className="text-xs opacity-80 mt-1"
-              style={{ color: accent.deep }}
-            >
-              API à brancher
-            </div>
-          </div>
-        </div>
-      </section>
+      <UpcomingCarousel
+        accent={accent}
+        nextActivity={nextActivity}
+        recentExpense={recentExpense}
+        remainingCount={remainingCount}
+      />
       <section className="px-5 mt-8">
         <div className="mk-eyebrow text-ink-mute">LE CREW EN CHIFFRES</div>
         <div className="mt-3 bg-white rounded-md border border-hairline overflow-hidden">
