@@ -56,13 +56,16 @@ Les deux sont indissociables. Le handoff Claude Design produit déjà du HTML/CS
 - Layouts desktop dédiés Home et Map (rail gauche + main). Planning, Budget, Guide : largeur max centrée.
 - Dark mode complet, switch automatique via `prefers-color-scheme` + toggle manuel optionnel via shadcn `theme-provider`.
 
-**Data + sync :**
+**Data + sync (offline-first) :**
 - Initial paint via Server Components (auth check + premier query Supabase serveur).
-- Mutations client-side via `@supabase/supabase-js` direct (RLS gère la sécurité).
-- TanStack Query pour client-side cache + invalidation après mutations.
-- Supabase Realtime branché sur `trips`, `expenses`, `activities`, `checklist_completions` pour la sync multi-user.
-- Optimistic updates sur les mutations rapides (toggle checklist, mark activity done).
-- Mode offline minimal : service worker cache les routes principales + assets ; mutations offline = file localStorage retry au retour réseau (best-effort, pas Legend State).
+- Cache local complet en IndexedDB via **Dexie.js** : toutes les rows des tables critiques (`trips`, `trip_members`, `days`, `activities`, `activity_completions`, `expenses`, `expense_splits`, `checklist_items`, `checklist_completions`, `spots`, `guide_cards`) du trip courant + des autres trips de l'utilisateur (lectures rapides au switch).
+- Hydratation : au boot, l'app lit depuis Dexie d'abord (instant), puis revalide via Supabase en arrière-plan.
+- Mutations client-side via `@supabase/supabase-js` direct (RLS gère la sécurité) **enveloppées dans une sync queue Dexie** : chaque mutation = entrée de queue avec `op` (insert/update/delete), `table`, `payload`, `created_at`, `status` (pending/sent/failed), `depends_on` (ID parent côté queue pour les insertions enfants type expense_splits qui dépendent d'un expense créé offline).
+- À la reconnexion : flush ordonné de la queue, retry exponentiel sur erreurs réseau, marque les conflits LWW par `updated_at` (last write wins, idem foundation), surface les erreurs RLS à l'UI ("cette dépense a été supprimée par un autre membre").
+- TanStack Query pour le cache mémoire en session + invalidation après mutations (couche au-dessus de Dexie).
+- Supabase Realtime branché sur `trips`, `expenses`, `activities`, `checklist_completions` pour la sync multi-user ; les events Realtime upsert directement dans Dexie.
+- Optimistic updates sur toutes les mutations (toggle checklist, mark activity done, add expense, etc.) — le UI lit toujours Dexie, donc l'optimistic est l'écriture Dexie elle-même.
+- Service worker (`@serwist/next`) cache les routes + assets + photos hero. L'app reste utilisable même au cold start sans réseau.
 
 **Migrations et seed :**
 - Migration DB `20260520_refonte_hero.sql` : ajout `trips.hero_image_url`, `trips.hero_image_uploaded`. Bucket `trip-covers` créé via SQL.
@@ -93,6 +96,8 @@ Les deux sont indissociables. Le handoff Claude Design produit déjà du HTML/CS
 | Data fetch client | `@supabase/supabase-js` + TanStack Query | Mutations + realtime, cache client. |
 | Realtime | Supabase Realtime | Déjà inclus, sync multi-user via channels par `trip_id`. |
 | State global UI | Zustand | `currentTripId`, drawer state, toast, etc. Léger, RSC-compatible. |
+| Cache offline | Dexie.js (IndexedDB) | Cache complet du trip + sync queue avec dépendances. Pas de PowerSync/Replicache (overkill pour notre volume). |
+| Résolution conflits sync | Last-write-wins par `updated_at` | Aligné avec foundation. Mutations enfants attendent leur parent côté queue. |
 | Map | Mapbox GL JS | Tiles vectoriels, custom style possible (matche le ton éditorial du handoff), free tier suffit. |
 | Map fallback gratuit | MapLibre GL JS (drop-in si Florian refuse Mapbox) | Fork open-source de Mapbox GL JS, même API. |
 | Storage photos | Supabase Storage bucket `trip-covers` | Aligné avec le reste du backend. |
@@ -339,7 +344,7 @@ lib/
 │  ├─ accent.ts
 │  ├─ hero.ts
 │  └─ fonts.ts                     ← export des next/font instances
-├─ queries/                        ← TanStack Query keys + fetchers client
+├─ queries/                        ← TanStack Query keys + fetchers (lecture Dexie + revalidation Supabase)
 │  ├─ trips.ts
 │  ├─ days.ts
 │  ├─ activities.ts
@@ -347,9 +352,17 @@ lib/
 │  ├─ expenses.ts
 │  ├─ checklist.ts
 │  └─ guide.ts
+├─ db/                              ← couche offline-first
+│  ├─ schema.ts                    ← Dexie schema (tables miroir Postgres)
+│  ├─ index.ts                     ← export instance Dexie
+│  ├─ hydrate.ts                   ← pull initial / refresh depuis Supabase
+│  ├─ realtime.ts                  ← branchement Supabase Realtime → Dexie upsert
+│  ├─ queue.ts                     ← sync queue : enqueue, flush, depends_on
+│  └─ mutations.ts                 ← wrappers typés (createExpense, toggleChecklist, etc.) — écrivent Dexie d'abord, queue ensuite
 ├─ stores/
 │  ├─ currentTrip.ts               ← Zustand
 │  └─ ui.ts                        ← Zustand : drawer, toast, etc.
+│  └─ syncStatus.ts                ← Zustand : online/offline, queue length, last sync
 └─ utils/
    ├─ join-code.ts
    ├─ split-debt.ts                ← calcul "qui doit quoi à qui"
@@ -499,12 +512,17 @@ Service worker via `@serwist/next` : runtime caching des routes principales + as
 
 Branche worktree `pivot-pwa-refonte-ui`. Chaque phase = commit runnable.
 
-### Phase 1 — Bootstrap Next.js + DS
+### Phase 1 — Bootstrap Next.js + DS + Dexie
 
-**Sortie :** Next.js démarre, fonts chargées, tokens exposés, shadcn initialisé. Aucun écran métier encore implémenté, juste une placeholder `/trips`.
+**Sortie :** Next.js démarre, fonts chargées, tokens exposés, shadcn initialisé, couche Dexie + sync queue minimale opérationnelle. Aucun écran métier encore implémenté, juste une placeholder `/trips`.
 
-- `npx create-next-app@latest` overlay sur le repo actuel (ou recréation propre, l'ancien Expo étant en git history).
-- Suppression des dépendances Expo/RN du `package.json`. Ajout `next`, `@supabase/ssr`, `@tanstack/react-query`, `zustand`, `@serwist/next`, `next-themes`, `clsx`, `tailwind-merge`, `lucide-react`, `mapbox-gl`, `react-map-gl`, `vaul`.
+**1.a — Cleanup Expo :**
+- Déplacement de `app/`, `components/`, `store/`, `index.ts`, `babel.config.js`, `metro.config.js`, `nativewind-env.d.ts`, `app.json`, `global.css`, `dist/` dans `_legacy/`.
+- Le dossier `_legacy/` sert de référence visuelle pendant Phase 1 puis est **supprimé à la fin de Phase 1** (git history préserve). À partir de Phase 2, plus aucun fichier legacy dans le working tree.
+
+**1.b — Bootstrap Next.js + shadcn :**
+- `npx create-next-app@latest` overlay sur le repo.
+- Suppression des dépendances Expo/RN du `package.json`. Ajout `next`, `@supabase/ssr`, `@tanstack/react-query`, `zustand`, `dexie`, `dexie-react-hooks`, `@serwist/next`, `next-themes`, `clsx`, `tailwind-merge`, `lucide-react`, `mapbox-gl`, `react-map-gl`, `vaul`.
 - `npx shadcn@latest init` (base color : `Stone` qui matche le sable, on override ensuite).
 - `lib/design/{tokens.ts, accent.ts, hero.ts, fonts.ts}` créés.
 - `tailwind.config.ts` écrit avec les tokens.
@@ -512,11 +530,23 @@ Branche worktree `pivot-pwa-refonte-ui`. Chaque phase = commit runnable.
 - `app/layout.tsx` avec les `next/font` + providers (TanStack Query, shadcn theme).
 - `middleware.ts` Supabase configuré.
 - `lib/supabase/{client,server,middleware}.ts` écrits.
-- Page placeholder `/trips/page.tsx` qui liste depuis Supabase (validation end-to-end : auth + RLS + render).
 - `.env.local` renommé pour Next.js (variables `NEXT_PUBLIC_*`).
 - Vercel : link et premier deploy preview pour valider le pipeline.
 
-**Validation :** ouvrir `localhost:3000`, se connecter via magic link, voir la liste des trips (Portugal seedé). Tokens visibles dans devtools.
+**1.c — Couche Dexie + sync queue minimale :**
+- `lib/db/schema.ts` : Dexie schema avec stores miroir des tables Supabase critiques. Version 1 simple.
+- `lib/db/index.ts` : instance Dexie singleton, init dans le provider client.
+- `lib/db/hydrate.ts` : `hydrateTrip(tripId)` qui pull toutes les tables liées à ce trip (depuis Supabase) et upsert dans Dexie. Appelé à chaque switch de trip + au boot.
+- `lib/db/queue.ts` : table `sync_queue` Dexie avec champs `id, op, table, payload, depends_on, created_at, status, attempts, last_error`. Fonctions `enqueue(op)`, `flush()`, `retry()`.
+- `lib/db/mutations.ts` : wrappers typés `createExpense`, `toggleChecklistItem`, etc. Écrivent dans Dexie (optimistic) + push dans la queue. La queue flush automatiquement quand `navigator.onLine === true`.
+- `lib/db/realtime.ts` : channel Supabase Realtime par trip, upsert direct dans Dexie. Ignore les changements provenant de soi-même (filtré par `payload.commit_timestamp` < `last_push`).
+- `lib/stores/syncStatus.ts` (Zustand) : `online`, `queueLength`, `lastSync`, `lastError`. UI bandeau si `queueLength > 0` ou `online === false`.
+
+**1.d — Page placeholder :**
+- `/trips/page.tsx` (RSC) : SELECT depuis Supabase côté serveur pour le premier paint.
+- `/trips/[tripId]/page.tsx` (RSC) : auth check + hydrate Dexie côté client + render placeholder "Home Sud-Ouest". Test end-to-end : auth → RLS → Dexie hydraté → UI affiche le voyage.
+
+**Validation :** ouvrir `localhost:3000`, se connecter via magic link, voir la liste des trips (Portugal seedé), basculer en mode offline (devtools), recharger : l'app fonctionne, Dexie sert les données. Tokens visibles dans devtools. `_legacy/` supprimé du working tree.
 
 ### Phase 2 — Home complet (variante skate, light)
 
@@ -565,6 +595,23 @@ Pour chaque écran : un commit, validation visuelle, push Vercel preview pour pa
 
 **Validation :** screenshots des 6 variantes du Home côte à côte (Portugal city, Sud-Ouest skate, GR20 rando fictif, etc.). Upload de photo testé : photo persiste après reload.
 
+### Phase 5.5 — Offline-first robustness
+
+**Sortie :** sync queue durcie, dépendances entre mutations gérées, conflits LWW remontés à l'UI, tests offline approfondis sur les 5 écrans.
+
+- Sync queue : enrichissement des `depends_on` pour les cas réels (créer expense puis splits du même expense, créer day puis activities, etc.). Les enfants attendent que le parent ait reçu son `id` serveur réel avant d'être flushés. Mapping `temp_id → server_id` géré dans la queue.
+- Retry policy : exponentiel (1s, 2s, 4s, 8s, max 30s), abandon après 5 tentatives avec entrée dans `lastError` + bandeau UI "1 modification en erreur, voir détails".
+- Vue diagnostique offline : `/trips/[tripId]/settings/sync` qui liste la queue, les erreurs, bouton "Forcer le flush", bouton "Annuler une mutation".
+- Conflict resolution UX : si une mutation locale échoue parce que l'entité a été supprimée côté serveur, on surface dans un toast : "Cette dépense a été supprimée par Théo. Ta modification a été annulée." Pour les conflits d'`updated_at` (LWW), pas de surface UI, on remplace silencieusement (déjà comporte`ment LWW).
+- Upload de photo offline : binary blob mis en queue Dexie (table dédiée `pending_uploads` pour ne pas saturer `sync_queue`). Flush au retour réseau.
+- Tests offline scénarios :
+  - Mode avion → créer dépense → relancer app → relancer réseau → vérifier sync.
+  - 2 devices simultanés en ligne → créer dépense sur device A, voir apparaître sur device B en < 2s (Realtime).
+  - Device A offline crée day + activities → device B en ligne supprime le day → device A revient en ligne → conflit géré (toast).
+  - Cold start avec service worker, sans réseau → app utilisable en lecture sur le trip actif.
+
+**Validation :** scénarios documentés exécutés sur 2 devices physiques (iOS + Android Chrome). Résultats consignés dans le PR.
+
 ### Phase 6 — Dark mode + responsive desktop + PWA
 
 **Sortie :** dark mode complet, desktop layouts Home et Map, PWA installable.
@@ -596,6 +643,10 @@ Pour chaque écran : un commit, validation visuelle, push Vercel preview pour pa
 | Upload photos via Canvas API échoue sur Safari iOS < 16 | Détection feature, fallback en upload brut sans resize. |
 | Modal full-screen sur mobile vs Dialog desktop centré | shadcn `Dialog` accepte `className` — on conditionne `inset-0` mobile vs `inset-1/2 -translate-1/2` desktop. |
 | Perte du seed Portugal pendant le port | `scripts/seed-portugal.ts` est idempotent (upsert par natural key). Re-runnable après chaque flush. |
+| Dexie schema bump casse les caches existants | Versioning Dexie strict avec migrations idempotentes (`db.version(2).stores(...).upgrade(tx => ...)`). Au pire on `db.delete()` et on re-hydrate depuis Supabase (perte de la queue uniquement, gérable en demandant à l'user de revenir online avant l'update). |
+| Mutations enfants flushées avant que le parent ait son `id` serveur | Champ `depends_on` dans la queue + mapping `temp_id → server_id` populé au flush du parent. Les enfants attendent. |
+| Realtime echo : on reçoit nos propres mutations en retour | Filtrage par `payload.commit_timestamp` vs `last_push_at` côté client. Sinon on dédoublonnerait nos propres insertions. |
+| Quota IndexedDB plein (rare, ~50% du disque libre) | Détection `navigator.storage.estimate()`, fallback en mode lecture-seule + notification user. Cas extrême, peu probable pour notre volume. |
 
 ## Definition of Done
 
@@ -610,6 +661,8 @@ Côté utilisateur :
 - Map interactive (Mapbox), pins par catégorie, bottom sheet draggable mobile, side panel desktop.
 - Sync multi-user via Supabase Realtime sur les modifs critiques (expenses, activities, checklist).
 - Voyage Portugal seedé visible + voyage Sud-Ouest skate visible côte à côte (validation 2 accents).
+- App utilisable **complètement hors-ligne** : lecture des trips déjà hydratés, écritures mises en file et flushées au retour réseau (incluant upload de photos).
+- Bandeau UI quand offline ou queue non vide. Vue diagnostique `/settings/sync` pour inspecter les mutations en attente.
 
 Côté technique :
 - Repo migré : aucun import `expo-*`, `react-native-*`, `@legendapp/state` ne reste.
@@ -623,18 +676,23 @@ Côté technique :
 - 18 photos hero embarquées en `public/heroes/`.
 - Manifest PWA + service worker via `@serwist/next` fonctionnels (Lighthouse PWA ≥ 90).
 - Déploiement Vercel automatique, env vars configurées.
-- Tests manuels documentés dans le PR (auth, multi-voyage, sync, RLS, PWA install, dark, desktop).
+- Couche offline-first : Dexie schema + hydrate + sync queue + Realtime → Dexie + mutations typées dans `lib/db/`.
+- Vue diagnostique `/trips/[tripId]/settings/sync` opérationnelle.
+- Tests manuels documentés dans le PR (auth, multi-voyage, sync, RLS, PWA install, dark, desktop, **scénarios offline Phase 5.5**).
 
 ## Estimation effort
 
-Indicatif : **8 à 12 jours** de dev focused.
+Indicatif : **10 à 15 jours** de dev focused.
 
 Découpe :
-- Phase 1 (bootstrap Next.js + DS) — 1.5 jour (inclut le nettoyage Expo + setup shadcn + auth SSR)
+- Phase 1 (bootstrap Next.js + DS + Dexie base) — 2 jours (inclut cleanup Expo, setup shadcn, auth SSR, couche offline initiale, Vercel pipeline)
 - Phase 2 (Home complet) — 1.5 jour (validation ADN incluse)
-- Phase 3 (DS extract) — 0.5 jour
-- Phase 4 (4 écrans restants) — 3 jours (Map 1 jour Mapbox + sheet, Planning 0.75, Guide 0.5, Budget 0.75)
-- Phase 5 (variantes + photos + upload) — 1.5 jour
+- Phase 3 (DS extract + mutations typées) — 0.75 jour
+- Phase 4 (4 écrans restants) — 3 jours (Map 1, Planning 0.75, Guide 0.5, Budget 0.75)
+- Phase 5 (variantes + photos + upload offline-aware) — 1.75 jour
+- Phase 5.5 (offline robustness : dépendances, retry, conflicts, tests 2 devices) — 1.5 à 2 jours
 - Phase 6 (dark + desktop + PWA) — 2 jours (PWA setup + Lighthouse audit)
 
-Risques temps majeurs : Phase 1 (cleanup Expo + setup auth SSR + Vercel pipeline), Phase 4-Map (Mapbox + sheet drag), Phase 6-PWA (service worker, tests cross-browser install).
+Risques temps majeurs : Phase 1 (cleanup Expo + setup auth SSR + Vercel pipeline + Dexie bootstrap), Phase 4-Map (Mapbox + sheet drag), Phase 5.5 (cas tordus des dépendances entre mutations enfants/parents et conflits Realtime echo), Phase 6-PWA (service worker, tests cross-browser install).
+
+Merge dans `main` : **unique en fin de Phase 6**, via PR globale depuis le worktree `pivot-pwa-refonte-ui`. `main` reste sur l'état foundation (Expo) jusqu'au merge final pour garder un état stable d'où relancer si on doit pivoter encore.
