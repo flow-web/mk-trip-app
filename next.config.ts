@@ -9,7 +9,8 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      // sera précisé en Phase 5 (Supabase Storage bucket)
+      { protocol: 'https', hostname: '**.supabase.co' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
 }
