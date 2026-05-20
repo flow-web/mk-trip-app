@@ -1,0 +1,20 @@
+{
+  "name": "MK Trip",
+  "short_name": "MK Trip",
+  "description": "Le carnet de bord du crew.",
+  "start_url": "/trips",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2EDE3",
+  "theme_color": "#1C1A17",
+  "icons": [
+    { "src": "/icons/192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/512.png", "sizes": "512x512", "type": "image/png" },
+    {
+      "src": "/icons/512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -6,6 +6,12 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'MK Trip',
   description: 'Le carnet de bord du crew.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'MK Trip',
+  },
 }
 
 export const viewport = {
