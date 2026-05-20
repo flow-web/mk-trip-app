@@ -4,55 +4,80 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 8%;
+    /* shadcn HSL mappings vers nos tokens MK light */
+    --background: 39 32% 92%;        /* paper #F2EDE3 */
+    --foreground: 25 11% 10%;        /* ink #1C1A17 */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 8%;
+    --card-foreground: 25 11% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 8%;
-    --primary: 0 0% 12%;
-    --primary-foreground: 0 0% 97%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 12%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 12%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 97%;
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 0 0% 70%;
-    --radius: 0.625rem;
+    --popover-foreground: 25 11% 10%;
+    --primary: 25 11% 10%;
+    --primary-foreground: 39 32% 92%;
+    --secondary: 39 17% 83%;         /* sand */
+    --secondary-foreground: 25 11% 10%;
+    --muted: 39 17% 83%;
+    --muted-foreground: 30 12% 43%;  /* inkMute */
+    --accent: 39 17% 83%;
+    --accent-foreground: 25 11% 10%;
+    --destructive: 8 56% 40%;        /* danger */
+    --destructive-foreground: 0 0% 98%;
+    --border: 25 11% 92%;
+    --input: 25 11% 92%;
+    --ring: 25 11% 10%;
+    --radius: 0.5rem;
   }
 
   .dark {
-    --background: 0 0% 8%;
-    --foreground: 0 0% 97%;
-    --card: 0 0% 12%;
-    --card-foreground: 0 0% 97%;
-    --popover: 0 0% 12%;
-    --popover-foreground: 0 0% 97%;
-    --primary: 0 0% 90%;
-    --primary-foreground: 0 0% 12%;
-    --secondary: 0 0% 16%;
-    --secondary-foreground: 0 0% 97%;
-    --muted: 0 0% 16%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 0 0% 16%;
-    --accent-foreground: 0 0% 97%;
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 97%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 0 0% 40%;
-  }
-
-  * {
-    @apply border-border;
+    --background: 35 22% 7%;         /* paperDark */
+    --foreground: 39 32% 92%;
+    --card: 35 19% 11%;
+    --card-foreground: 39 32% 92%;
+    --popover: 35 19% 11%;
+    --popover-foreground: 39 32% 92%;
+    --primary: 39 32% 92%;
+    --primary-foreground: 25 11% 10%;
+    --secondary: 32 18% 14%;
+    --secondary-foreground: 39 32% 92%;
+    --muted: 32 18% 14%;
+    --muted-foreground: 38 9% 49%;
+    --accent: 32 18% 14%;
+    --accent-foreground: 39 32% 92%;
+    --destructive: 8 56% 40%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 38 17% 18%;
+    --input: 38 17% 18%;
+    --ring: 39 32% 92%;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-paper text-ink font-body antialiased;
+    font-family: var(--font-body);
   }
+  body.dark {
+    @apply bg-paper-dark text-ink-dark;
+  }
+}
+
+@layer components {
+  .mk-eyebrow {
+    @apply font-mono uppercase tracking-eyebrow text-[10px] font-medium;
+  }
+  .mk-display {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 0.95;
+  }
+  .mk-display-italic {
+    font-family: var(--font-display-italic);
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .mk-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .mk-noscroll::-webkit-scrollbar { display: none; }
+  .mk-noscroll { scrollbar-width: none; }
 }
