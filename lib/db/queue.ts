@@ -87,6 +87,9 @@ export async function flush(): Promise<void> {
     }
   }
   await refreshStatus()
+  // Dynamic import pour casser le cycle queue ↔ uploads ↔ mutations
+  const { flushUploads } = await import('./uploads')
+  await flushUploads()
   useSyncStatus.getState().setLastSyncAt(Date.now())
 }
 

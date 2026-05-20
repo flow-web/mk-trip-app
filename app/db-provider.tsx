@@ -3,6 +3,7 @@
 import { useEffect, type ReactNode } from 'react'
 import { hydrateAllTrips } from '@/lib/db/hydrate'
 import { flush, refreshStatus } from '@/lib/db/queue'
+import { flushUploads } from '@/lib/db/uploads'
 
 export function DbProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
@@ -10,11 +11,18 @@ export function DbProvider({ children }: { children: ReactNode }) {
     ;(async () => {
       await refreshStatus()
       if (cancelled) return
-      try { await hydrateAllTrips() } catch (e) { console.warn('hydrate failed', e) }
+      try {
+        await hydrateAllTrips()
+      } catch (e) {
+        console.warn('hydrate failed', e)
+      }
       if (cancelled) return
       flush()
+      flushUploads()
     })()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [])
   return <>{children}</>
 }
