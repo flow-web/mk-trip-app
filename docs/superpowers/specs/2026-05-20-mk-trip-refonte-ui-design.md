@@ -600,6 +600,7 @@ Pour chaque écran : un commit, validation visuelle, push Vercel preview pour pa
 **Sortie :** sync queue durcie, dépendances entre mutations gérées, conflits LWW remontés à l'UI, tests offline approfondis sur les 5 écrans.
 
 - Sync queue : enrichissement des `depends_on` pour les cas réels (créer expense puis splits du même expense, créer day puis activities, etc.). Les enfants attendent que le parent ait reçu son `id` serveur réel avant d'être flushés. Mapping `temp_id → server_id` géré dans la queue.
+- **Verrou Realtime ↔ mutation locale en attente.** Chaque row Dexie reçoit un champ `_pending_mutation_id` (UUID) au moment d'une écriture locale, cleared dans le callback de flush réussi. Le subscriber Realtime skip l'upsert d'une row si `_pending_mutation_id` est non-null — sinon le push remote écraserait silencieusement une mutation locale pas encore syncée. Si le push remote concerne une row sans mutation locale, upsert normal.
 - Retry policy : exponentiel (1s, 2s, 4s, 8s, max 30s), abandon après 5 tentatives avec entrée dans `lastError` + bandeau UI "1 modification en erreur, voir détails".
 - Vue diagnostique offline : `/trips/[tripId]/settings/sync` qui liste la queue, les erreurs, bouton "Forcer le flush", bouton "Annuler une mutation".
 - Conflict resolution UX : si une mutation locale échoue parce que l'entité a été supprimée côté serveur, on surface dans un toast : "Cette dépense a été supprimée par Théo. Ta modification a été annulée." Pour les conflits d'`updated_at` (LWW), pas de surface UI, on remplace silencieusement (déjà comporte`ment LWW).
@@ -646,6 +647,7 @@ Pour chaque écran : un commit, validation visuelle, push Vercel preview pour pa
 | Dexie schema bump casse les caches existants | Versioning Dexie strict avec migrations idempotentes (`db.version(2).stores(...).upgrade(tx => ...)`). Au pire on `db.delete()` et on re-hydrate depuis Supabase (perte de la queue uniquement, gérable en demandant à l'user de revenir online avant l'update). |
 | Mutations enfants flushées avant que le parent ait son `id` serveur | Champ `depends_on` dans la queue + mapping `temp_id → server_id` populé au flush du parent. Les enfants attendent. |
 | Realtime echo : on reçoit nos propres mutations en retour | Filtrage par `payload.commit_timestamp` vs `last_push_at` côté client. Sinon on dédoublonnerait nos propres insertions. |
+| Push Realtime écrase une mutation locale en attente | Champ `_pending_mutation_id` sur la row Dexie set au moment de l'écriture locale, cleared au flush réussi. Le subscriber Realtime skip l'upsert si ce champ est set. Voir Phase 5.5. |
 | Quota IndexedDB plein (rare, ~50% du disque libre) | Détection `navigator.storage.estimate()`, fallback en mode lecture-seule + notification user. Cas extrême, peu probable pour notre volume. |
 
 ## Definition of Done
