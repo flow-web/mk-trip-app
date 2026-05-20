@@ -16,15 +16,17 @@ import {
   Zap,
   MapPin,
 } from "lucide-react-native";
+import { use$ } from "@legendapp/state/react";
 import FloatingDock from "../../../../components/FloatingDock";
 import SpotCard from "../../../../components/SpotCard";
 import {
-  SPOTS,
   ZONES,
   CATEGORY_CONFIG,
   type Spot,
   type SpotCategory,
-} from "../../../../components/MapData";
+} from "../../../../lib/mapConfig";
+import { spots$ } from "../../../../store/spots$";
+import { currentTripId$ } from "../../../../store/currentTrip$";
 
 // ─── Dark map style ───────────────────────────────────────────────────────────
 const DARK_MAP_STYLE = [
@@ -402,6 +404,19 @@ function NativeMapView({
 
 // ─── Main screen ──────────────────────────────────────────────────────────────
 export default function MapScreen() {
+  const tripId = use$(currentTripId$);
+  const SPOTS: Spot[] = (Object.values(use$(spots$) ?? {}) as any[])
+    .filter((s) => s.trip_id === tripId)
+    .map((s) => ({
+      id: s.id,
+      name: s.name,
+      description: s.description ?? "",
+      category: s.category as SpotCategory,
+      zone: (s.zone === "alentejo" ? "alentejo" : "lisboa") as "lisboa" | "alentejo",
+      coordinate: { latitude: Number(s.lat), longitude: Number(s.lng) },
+      price: s.price ?? undefined,
+    }));
+
   const [activeZone, setActiveZone] = useState<"lisboa" | "alentejo">("lisboa");
   const [activeCategories, setActiveCategories] = useState<Set<SpotCategory>>(new Set());
   const [selectedSpot, setSelectedSpot] = useState<Spot | null>(null);

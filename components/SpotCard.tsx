@@ -1,6 +1,6 @@
 import { View, Text, Pressable } from "react-native";
 import { X, UtensilsCrossed, Landmark, Wine, Trees, Hotel, Zap, MapPin } from "lucide-react-native";
-import { Spot, CATEGORY_CONFIG } from "./MapData";
+import { Spot, CATEGORY_CONFIG } from "../lib/mapConfig";
 
 type Props = {
   spot: Spot | null;
