@@ -7,6 +7,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import {
   UtensilsCrossed,
@@ -19,7 +20,14 @@ import {
   Check,
   ChevronDown,
 } from "lucide-react-native";
-import { useBudget, ExpenseCategory } from "./BudgetStore";
+import { use$ } from "@legendapp/state/react";
+import { supabase } from "../lib/supabase";
+import { auth$ } from "../store/auth$";
+import { currentTripId$ } from "../store/currentTrip$";
+import { expenses$ } from "../store/expenses$";
+import { expenseSplits$ } from "../store/expenseSplits$";
+
+type ExpenseCategory = "food" | "transport" | "hotel" | "activity" | "drink" | "shopping" | "other";
 
 type CategoryDef = {
   key: ExpenseCategory;
@@ -44,7 +52,8 @@ type Props = {
 };
 
 export default function AddExpenseModal({ visible, onClose }: Props) {
-  const { addExpense } = useBudget();
+  const tripId = use$(currentTripId$);
+  const [loading, setLoading]   = useState(false);
   const [category, setCategory] = useState<ExpenseCategory | null>(null);
   const [amount, setAmount]     = useState("0");
   const [note, setNote]         = useState("");
@@ -64,7 +73,7 @@ export default function AddExpenseModal({ visible, onClose }: Props) {
 
   const handlePad = (key: string) => {
     if (key === "✓") {
-      handleConfirm();
+      onAdd();
       return;
     }
     if (key === "⌫") {
@@ -83,15 +92,45 @@ export default function AddExpenseModal({ visible, onClose }: Props) {
     });
   };
 
-  const handleConfirm = () => {
-    const parsed = parseFloat(amount);
-    if (!category || !parsed || parsed <= 0) return;
-    addExpense({
-      amount: parsed,
-      category,
-      note: note.trim() || undefined,
-      date: new Date().toISOString(),
-    });
+  const onAdd = async () => {
+    if (!tripId) return;
+    const userId = auth$.user.peek()?.id;
+    if (!userId) return;
+    const amountNum = Number(amount.replace(",", "."));
+    if (!amountNum || amountNum <= 0) {
+      Alert.alert("Montant invalide");
+      return;
+    }
+    if (!category) return;
+    const amountCents = Math.round(amountNum * 100);
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("expenses")
+      .insert({
+        trip_id: tripId,
+        payer_id: userId,
+        amount: amountCents,
+        currency: "EUR",
+        category: category,
+        note: note.trim() || null,
+        spent_at: new Date().toISOString(),
+        split_mode: "equal",
+      })
+      .select()
+      .single();
+    if (error || !data) {
+      setLoading(false);
+      Alert.alert("Erreur", error?.message ?? "Insertion impossible");
+      return;
+    }
+    // Met l'expense dans le store
+    (expenses$ as any)[data.id].set(data);
+    // Insert un split pour le payer (montant complet pour cette première version)
+    const splitKey = `${data.id}_${userId}`;
+    const splitRow = { expense_id: data.id, user_id: userId, share: 1 };
+    (expenseSplits$ as any)[splitKey].set(splitRow);
+    await supabase.from("expense_splits").insert(splitRow as any);
+    setLoading(false);
     handleClose();
   };
 

@@ -19,7 +19,23 @@ import {
   Trash2,
 } from "lucide-react-native";
 import FloatingDock from "../../../../components/FloatingDock";
-import { useBudget, ExpenseCategory, Expense } from "../../../../components/BudgetStore";
+import { use$ } from "@legendapp/state/react";
+import { expenses$ } from "../../../../store/expenses$";
+import { trips$ } from "../../../../store/trips$";
+import { currentTripId$ } from "../../../../store/currentTrip$";
+import { supabase } from "../../../../lib/supabase";
+
+type ExpenseCategory = "food" | "transport" | "hotel" | "activity" | "drink" | "shopping" | "other";
+
+type Expense = {
+  id: string;
+  trip_id: string;
+  payer_id: string;
+  amount: number; // EN CENTIMES dans le store, divisé pour affichage
+  category: ExpenseCategory;
+  note: string | null;
+  spent_at: string;
+};
 
 // ─── Category config ──────────────────────────────────────────────────────────
 
@@ -149,7 +165,7 @@ function CategoryBreakdown({ expenses, total }: { expenses: Expense[]; total: nu
       {cats.map(([key, { Icon, color }]) => {
         const catSpent = expenses
           .filter((e) => e.category === key)
-          .reduce((s, e) => s + e.amount, 0);
+          .reduce((s, e) => s + Number(e.amount) / 100, 0);
         const ratio = total > 0 ? Math.min(catSpent / total, 1) : 0;
 
         return (
@@ -208,7 +224,7 @@ function ExpenseRow({
   const handleDelete = () => {
     Alert.alert(
       "Supprimer",
-      `Supprimer cette dépense de ${expense.amount}€ ?`,
+      `Supprimer cette dépense de ${(Number(expense.amount) / 100).toLocaleString("fr-FR")}€ ?`,
       [
         { text: "Annuler", style: "cancel" },
         { text: "Supprimer", style: "destructive", onPress: onDelete },
@@ -216,7 +232,7 @@ function ExpenseRow({
     );
   };
 
-  const date = new Date(expense.date);
+  const date = new Date(expense.spent_at);
   const timeStr = date.toLocaleTimeString("fr-FR", {
     hour: "2-digit",
     minute: "2-digit",
@@ -267,7 +283,7 @@ function ExpenseRow({
           marginRight: 12,
         }}
       >
-        -{expense.amount.toLocaleString("fr-FR")}€
+        -{(Number(expense.amount) / 100).toLocaleString("fr-FR")}€
       </Text>
 
       {/* Delete */}
@@ -289,7 +305,22 @@ function ExpenseRow({
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
 export default function Budget() {
-  const { totalBudget, expenses, removeExpense, totalSpent, remaining } = useBudget();
+  const tripId = use$(currentTripId$);
+  const trip = use$((trips$ as any)[tripId ?? "_"]);
+  const totalBudget = Number(trip?.total_budget ?? 0);
+  const allExpenses = (Object.values(use$(expenses$) ?? {}) as any[])
+    .filter((e) => e.trip_id === tripId)
+    .sort((a, b) => new Date(b.spent_at).getTime() - new Date(a.spent_at).getTime());
+  const totalSpentCents = allExpenses.reduce((s, e) => s + Number(e.amount), 0);
+  const totalSpent = totalSpentCents / 100;
+  const remaining = totalBudget - totalSpent;
+
+  const removeExpense = async (id: string) => {
+    (expenses$ as any)[id].delete();
+    await supabase.from("expenses").delete().eq("id", id);
+  };
+
+  const expenses = allExpenses as Expense[];
 
   return (
     <View className="flex-1 bg-bg-dark">
@@ -337,7 +368,7 @@ export default function Budget() {
                   textTransform: "uppercase",
                 }}
               >
-                Portugal
+                {trip?.destination ?? "Voyage"}
               </Text>
             </View>
           </View>
