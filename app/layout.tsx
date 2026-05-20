@@ -1,3 +1,9 @@
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+
+
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <html><body>{children}</body></html>
+  return <html className={cn("font-sans", geist.variable)}><body>{children}</body></html>
 }
