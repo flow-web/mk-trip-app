@@ -5,6 +5,7 @@ import TimelineScroll from "../../../../components/TimelineScroll";
 import FloatingDock from "../../../../components/FloatingDock";
 import { useBudget } from "../../../../components/BudgetStore";
 import AnimatedEntry from "../../../../components/AnimatedEntry";
+import TripSwitcher from "../../../../components/TripSwitcher";
 
 export default function Dashboard() {
   const { totalBudget, totalSpent, remaining } = useBudget();
@@ -17,12 +18,7 @@ export default function Dashboard() {
           {/* Header — minimal */}
           <AnimatedEntry delay={0}>
             <View className="flex-row justify-between items-center px-4 pt-2 pb-4">
-              <Text
-                className="text-txt-main text-xl font-semibold"
-                style={{ letterSpacing: -0.5 }}
-              >
-                MK Trip
-              </Text>
+              <TripSwitcher />
               <View className="bg-primary/15 rounded-pill px-3 py-1">
                 <Text className="text-primary text-xs font-bold tracking-wider uppercase">
                   Avril
