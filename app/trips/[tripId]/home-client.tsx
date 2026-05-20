@@ -29,10 +29,8 @@ export function HomeClient({
 }) {
   const trip = useLiveQuery(() => db.trips.get(tripId)) ?? initialTrip
   const accent = accentFor(trip.trip_type)
-  const heroLocal = defaultHeroFor(trip.id, trip.trip_type)
-  const heroUrl = heroLocal.startsWith('/')
-    ? 'https://images.unsplash.com/photo-1531565637446-32307b194362?w=1200&q=80'
-    : heroLocal
+  const heroUrl =
+    trip.hero_image_url ?? defaultHeroFor(trip.id, trip.trip_type)
 
   const today = new Date().toISOString().slice(0, 10)
 
