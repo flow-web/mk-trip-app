@@ -27,7 +27,9 @@ export default function NewTripPage() {
   const [name, setName] = useState('')
   const [destination, setDestination] = useState('')
   const [type, setType] = useState<TripType>('sport')
-  const [heroUrl, setHeroUrl] = useState<string | null>('/heroes/sport/1.jpg')
+  const [heroUrl, setHeroUrl] = useState<string | null>(
+    'https://images.unsplash.com/photo-1531565637446-32307b194362?w=1200&q=80',
+  )
   const [pendingFile, setPendingFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -90,10 +92,11 @@ export default function NewTripPage() {
         />
         <select
           value={type}
-          onChange={(e) => {
+          onChange={async (e) => {
             const t = e.target.value as TripType
             setType(t)
-            setHeroUrl(`/heroes/${t}/1.jpg`)
+            const { HERO_PHOTOS } = await import('@/lib/design/hero-photos')
+            setHeroUrl(HERO_PHOTOS[t]?.[0] ?? null)
             setPendingFile(null)
           }}
           className="w-full h-10 px-3 rounded-sm border border-input bg-background text-sm"

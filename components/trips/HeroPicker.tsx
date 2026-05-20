@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useRef } from 'react'
 import { Upload } from 'lucide-react'
+import { HERO_PHOTOS } from '@/lib/design/hero-photos'
 import type { Database } from '@/lib/supabase/types'
 
 type TripType = Database['public']['Enums']['trip_type']
@@ -16,7 +17,7 @@ interface Props {
 
 export function HeroPicker({ type, value, onChange, onFileSelected }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
-  const defaults = [1, 2, 3].map((i) => `/heroes/${type}/${i}.jpg`)
+  const defaults = HERO_PHOTOS[type] ?? HERO_PHOTOS.other
 
   return (
     <div>

@@ -1,5 +1,11 @@
-// lib/design/hero.ts
-import type { TripType } from './accent'
+// lib/design/hero.ts — sélection déterministe de la photo par défaut.
+// Retourne maintenant une URL Unsplash (cf. hero-photos.ts) ; Phase 5 storage
+// remplacera par des assets locaux ou hostés sur Supabase Storage.
+
+import type { Database } from '@/lib/supabase/types'
+import { HERO_PHOTOS } from './hero-photos'
+
+type TripType = Database['public']['Enums']['trip_type']
 
 const hashCode = (s: string): number => {
   let h = 0
@@ -8,6 +14,7 @@ const hashCode = (s: string): number => {
 }
 
 export function defaultHeroFor(tripId: string, type: TripType): string {
-  const idx = (hashCode(tripId) % 3) + 1
-  return `/heroes/${type}/${idx}.jpg`
+  const photos = HERO_PHOTOS[type] ?? HERO_PHOTOS.other
+  const idx = hashCode(tripId) % photos.length
+  return photos[idx]
 }
