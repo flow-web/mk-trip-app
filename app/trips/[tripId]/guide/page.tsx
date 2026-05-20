@@ -42,7 +42,7 @@ export default function GuidePage() {
   }
 
   return (
-    <main className="min-h-screen bg-paper dark:bg-paper-dark pb-24">
+    <main className="min-h-screen bg-paper dark:bg-paper-dark pb-24 md:max-w-[720px] md:mx-auto">
       <div className="pt-12 px-5">
         <TripSwitcher
           tone="light"

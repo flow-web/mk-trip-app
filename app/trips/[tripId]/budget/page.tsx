@@ -97,7 +97,7 @@ export default function BudgetPage() {
     .sort((a, b) => +new Date(b.spent_at) - +new Date(a.spent_at))
 
   return (
-    <main className="min-h-screen bg-paper dark:bg-paper-dark pb-32">
+    <main className="min-h-screen bg-paper dark:bg-paper-dark pb-32 md:max-w-[720px] md:mx-auto">
       <div className="pt-12 px-5">
         <TripSwitcher
           tone="light"

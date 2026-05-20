@@ -131,14 +131,26 @@ export function HomeClient({
         }
       />
 
-      <UpcomingCarousel
-        accent={accent}
-        nextActivity={nextActivity}
-        recentExpense={recentExpense}
-        remainingCount={remainingCount}
-      />
-      <CrewStats stats={stats} />
-      <QuickActions tripId={tripId} />
+      <div className="md:grid md:grid-cols-[1.4fr_1fr] md:gap-6 md:px-8 md:py-6">
+        <div className="md:flex md:flex-col md:gap-5">
+          <UpcomingCarousel
+            accent={accent}
+            nextActivity={nextActivity}
+            recentExpense={recentExpense}
+            remainingCount={remainingCount}
+          />
+          <CrewStats stats={stats} />
+          <div className="md:hidden">
+            <QuickActions tripId={tripId} />
+          </div>
+        </div>
+        <div className="hidden md:flex md:flex-col md:gap-3.5">
+          <div className="bg-paper-deep dark:bg-paper-dark-deep rounded-md h-[220px] flex items-center justify-center text-ink-mute dark:text-ink-mute-dark">
+            <span className="mk-mono text-xs">MINI MAP · TODO</span>
+          </div>
+          <QuickActions tripId={tripId} />
+        </div>
+      </div>
     </main>
   )
 }
