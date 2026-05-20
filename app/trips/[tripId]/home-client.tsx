@@ -1,11 +1,12 @@
 'use client'
 
-import Image from 'next/image'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Bell, CalendarPlus, ChevronDown, MapPin, Plus, Receipt } from 'lucide-react'
+import { CalendarPlus, MapPin, Plus, Receipt } from 'lucide-react'
 import { db } from '@/lib/db'
 import { accentFor } from '@/lib/design/accent'
 import { defaultHeroFor } from '@/lib/design/hero'
+import { Hero } from '@/components/design/Hero'
+import { TripSwitcher } from '@/components/design/TripSwitcher'
 import type { Database } from '@/lib/supabase/types'
 
 type Trip = Database['public']['Tables']['trips']['Row']
@@ -104,65 +105,31 @@ export function HomeClient({
     { label: 'budget', val: totalSpent.toFixed(0), unit: budget ? `/ ${budget}€` : '€' },
   ]
 
+  const heroEyebrow =
+    trip.start_date && trip.end_date
+      ? `${trip.trip_type.toUpperCase()} · ${formatRange(trip.start_date, trip.end_date)}`
+      : trip.trip_type.toUpperCase()
+  const heroBadge =
+    daysTotal > 0 ? `JOUR ${daysElapsed} / ${daysTotal}` : 'JOUR — / —'
+
   return (
     <main className="min-h-screen bg-paper flex flex-col pb-24 md:pb-0">
-      <section className="relative h-[420px] md:h-[480px] w-full overflow-hidden">
-        <Image
-          src={heroUrl}
-          alt={trip.name}
-          fill
-          className="object-cover"
-          priority
-          unoptimized
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80" />
-
-        <div className="absolute top-0 left-0 right-0 pt-14 px-5 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div
-              className="w-9 h-9 rounded-sm flex items-center justify-center"
-              style={{ background: 'rgba(255,255,255,.18)' }}
-            >
-              <span className="text-white text-sm font-display font-bold">MK</span>
-            </div>
-            <div className="flex flex-col text-white">
-              <div className="flex items-center gap-1 font-display font-bold text-base">
-                {trip.name}
-                <ChevronDown className="w-4 h-4 opacity-70" strokeWidth={1.75} />
-              </div>
-              <div className="mk-mono text-[10px] opacity-70">
-                {trip.trip_type.toUpperCase()}
-              </div>
-            </div>
-          </div>
-          <button
-            type="button"
-            className="w-9 h-9 rounded-sm border border-white/20 flex items-center justify-center"
-          >
-            <Bell className="w-4 h-4 text-white" strokeWidth={1.75} />
-          </button>
-        </div>
-
-        <div className="absolute left-5 right-5 bottom-5 text-white">
-          <div className="mk-eyebrow text-white/85">
-            {trip.start_date && trip.end_date
-              ? `${trip.trip_type.toUpperCase()} · ${formatRange(trip.start_date, trip.end_date)}`
-              : trip.trip_type.toUpperCase()}
-          </div>
-          <h1 className="mk-display text-5xl md:text-7xl mt-2 whitespace-pre-line">
-            {trip.name.split(' ').join('\n')}
-          </h1>
-          <div className="flex items-center gap-3 mt-4">
-            <span
-              className="px-2.5 py-1 rounded-xs text-white text-base mk-display-italic"
-              style={{ background: accent.base }}
-            >
-              JOUR — / —
-            </span>
-            <span className="mk-mono text-sm">{trip.destination ?? '—'}</span>
-          </div>
-        </div>
-      </section>
+      <Hero
+        photo={heroUrl}
+        accent={accent}
+        eyebrow={heroEyebrow}
+        title={trip.name.split(' ').join('\n')}
+        metaBadge={heroBadge}
+        metaRight={trip.destination ?? '—'}
+        topBar={
+          <TripSwitcher
+            tone="dark"
+            tripName={trip.name}
+            tripType={trip.trip_type}
+            sublabel={trip.destination ?? undefined}
+          />
+        }
+      />
 
       <section className="px-5 mt-5">
         <div className="flex items-center justify-between mb-3">
