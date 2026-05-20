@@ -14,11 +14,11 @@ export default function SyncDiagnosticPage() {
   const { online, queueLength, failedCount, lastSyncAt } = useSyncStatus()
 
   return (
-    <main className="min-h-screen bg-paper p-5 pb-24">
-      <div className="mk-eyebrow text-ink-mute">DIAGNOSTIQUE SYNC</div>
+    <main className="min-h-screen bg-paper dark:bg-paper-dark p-5 pb-24">
+      <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark">DIAGNOSTIQUE SYNC</div>
       <h1 className="mk-display text-3xl mt-2">État du sync.</h1>
 
-      <div className="mt-6 bg-white border border-hairline rounded-md p-4 space-y-2">
+      <div className="mt-6 bg-white dark:bg-paper-dark-deep border border-hairline dark:border-hairline-dark rounded-md p-4 space-y-2">
         <Row label="Online" value={online ? 'Oui' : 'Non'} />
         <Row label="En attente" value={String(queueLength)} />
         <Row label="En erreur" value={String(failedCount)} />
@@ -42,14 +42,14 @@ export default function SyncDiagnosticPage() {
 
       {queue.length > 0 && (
         <div className="mt-8">
-          <div className="mk-eyebrow text-ink-mute mb-2">
+          <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark mb-2">
             QUEUE ({queue.length})
           </div>
-          <div className="bg-white border border-hairline rounded-md overflow-hidden">
+          <div className="bg-white dark:bg-paper-dark-deep border border-hairline dark:border-hairline-dark rounded-md overflow-hidden">
             {queue.map((q) => (
               <div
                 key={q.id}
-                className="px-3 py-2.5 border-b border-hairline last:border-b-0"
+                className="px-3 py-2.5 border-b border-hairline dark:border-hairline-dark last:border-b-0"
               >
                 <div className="flex items-center justify-between">
                   <span className="mk-mono text-xs">
@@ -71,7 +71,7 @@ export default function SyncDiagnosticPage() {
                     {q.last_error}
                   </div>
                 )}
-                <div className="mk-mono text-[10px] text-ink-mute mt-0.5">
+                <div className="mk-mono text-[10px] text-ink-mute dark:text-ink-mute-dark mt-0.5">
                   attempts: {q.attempts} ·{' '}
                   {new Date(q.created_at).toLocaleTimeString('fr')}
                 </div>
@@ -104,14 +104,14 @@ export default function SyncDiagnosticPage() {
 
       {uploads.length > 0 && (
         <div className="mt-8">
-          <div className="mk-eyebrow text-ink-mute mb-2">
+          <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark mb-2">
             UPLOADS ({uploads.length})
           </div>
-          <div className="bg-white border border-hairline rounded-md overflow-hidden">
+          <div className="bg-white dark:bg-paper-dark-deep border border-hairline dark:border-hairline-dark rounded-md overflow-hidden">
             {uploads.map((u) => (
               <div
                 key={u.id}
-                className="px-3 py-2.5 border-b border-hairline last:border-b-0 mk-mono text-xs"
+                className="px-3 py-2.5 border-b border-hairline dark:border-hairline-dark last:border-b-0 mk-mono text-xs"
               >
                 {u.filename} · {u.status} · {(u.file.size / 1024).toFixed(0)} ko
               </div>
@@ -126,7 +126,7 @@ export default function SyncDiagnosticPage() {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between text-sm">
-      <span className="text-ink-soft">{label}</span>
+      <span className="text-ink-soft dark:text-ink-soft-dark">{label}</span>
       <span className="mk-mono">{value}</span>
     </div>
   )

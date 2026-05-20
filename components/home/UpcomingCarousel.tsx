@@ -33,7 +33,7 @@ export function UpcomingCarousel({
     <section className="px-5 mt-5">
       <div className="flex items-center justify-between mb-3">
         <div>
-          <div className="mk-eyebrow text-ink-mute">À VENIR · AUJOURD'HUI</div>
+          <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark">À VENIR · AUJOURD'HUI</div>
           <h2 className="font-display font-bold text-xl mt-1">
             {remainingCount > 0
               ? `Encore ${remainingCount} chose${remainingCount > 1 ? 's' : ''}.`

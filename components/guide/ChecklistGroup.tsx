@@ -24,7 +24,7 @@ export function ChecklistGroup({ items, accent, onToggle, onAdd }: Props) {
   return (
     <div>
       <div className="flex items-center justify-between">
-        <div className="mk-eyebrow text-ink-mute">CHECKLIST MATOS</div>
+        <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark">CHECKLIST MATOS</div>
         <div
           className="mk-mono text-[11px] font-semibold"
           style={{ color: accent.base }}
@@ -32,14 +32,14 @@ export function ChecklistGroup({ items, accent, onToggle, onAdd }: Props) {
           {doneCount} / {items.length}
         </div>
       </div>
-      <div className="mt-3 bg-white rounded-md border border-hairline overflow-hidden">
+      <div className="mt-3 bg-white dark:bg-paper-dark-deep rounded-md border border-hairline dark:border-hairline-dark overflow-hidden">
         {items.map((item, i) => (
           <button
             key={item.id}
             type="button"
             onClick={() => onToggle(item.id, item.done)}
             className={`w-full flex items-center gap-3 px-3.5 py-3 text-left ${
-              i ? 'border-t border-hairline' : ''
+              i ? 'border-t border-hairline dark:border-hairline-dark' : ''
             }`}
           >
             <div
@@ -78,7 +78,7 @@ export function ChecklistGroup({ items, accent, onToggle, onAdd }: Props) {
           <button
             type="button"
             onClick={onAdd}
-            className="w-full flex items-center gap-2 px-3.5 py-3 border-t border-hairline text-ink-mute text-sm"
+            className="w-full flex items-center gap-2 px-3.5 py-3 border-t border-hairline dark:border-hairline-dark text-ink-mute dark:text-ink-mute-dark text-sm"
           >
             <span>+ Ajouter un item</span>
           </button>

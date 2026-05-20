@@ -97,7 +97,7 @@ export default function BudgetPage() {
     .sort((a, b) => +new Date(b.spent_at) - +new Date(a.spent_at))
 
   return (
-    <main className="min-h-screen bg-paper pb-32">
+    <main className="min-h-screen bg-paper dark:bg-paper-dark pb-32">
       <div className="pt-12 px-5">
         <TripSwitcher
           tone="light"
@@ -107,17 +107,17 @@ export default function BudgetPage() {
         />
       </div>
       <div className="px-5 mt-4">
-        <Eyebrow className="text-ink-mute">BUDGET · TOTAL DÉPENSÉ</Eyebrow>
+        <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">BUDGET · TOTAL DÉPENSÉ</Eyebrow>
         <div className="flex items-baseline justify-between mt-1.5">
           <div className="mk-display text-5xl">
             {Math.floor(totalCents / 100)}
-            <span className="text-3xl text-ink-mute">
+            <span className="text-3xl text-ink-mute dark:text-ink-mute-dark">
               ,{(totalCents % 100).toString().padStart(2, '0')} €
             </span>
           </div>
           <div className="text-right">
             {budget > 0 && (
-              <div className="mk-mono text-[11px] text-ink-mute">
+              <div className="mk-mono text-[11px] text-ink-mute dark:text-ink-mute-dark">
                 BUDGET {(budget / 100).toFixed(0)} €
               </div>
             )}
@@ -132,7 +132,7 @@ export default function BudgetPage() {
           </div>
         </div>
         {budget > 0 && (
-          <div className="mt-3 h-1.5 bg-sand rounded-full overflow-hidden">
+          <div className="mt-3 h-1.5 bg-sand dark:bg-sand-dark rounded-full overflow-hidden">
             <div
               className="h-full"
               style={{
@@ -144,21 +144,21 @@ export default function BudgetPage() {
         )}
 
         <div className="mt-7">
-          <Eyebrow className="text-ink-mute">QUI DOIT QUOI À QUI</Eyebrow>
+          <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">QUI DOIT QUOI À QUI</Eyebrow>
           <div className="mt-3">
             <DebtFlow lines={debts} />
           </div>
         </div>
 
         <div className="mt-7">
-          <Eyebrow className="text-ink-mute">PAR CATÉGORIE</Eyebrow>
+          <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">PAR CATÉGORIE</Eyebrow>
           <div className="mt-3">
             <CategoryTiles tiles={tiles} />
           </div>
         </div>
 
         <div className="mt-7">
-          <Eyebrow className="text-ink-mute">DÉPENSES RÉCENTES</Eyebrow>
+          <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">DÉPENSES RÉCENTES</Eyebrow>
           <div className="mt-3">
             {sortedExpenses.map((e) => (
               <ExpenseRow

@@ -26,7 +26,7 @@ export function BottomTab({
   const path = usePathname()
   const accent = accentFor(tripType)
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-paper border-t border-hairline pt-2 pb-6 flex justify-around z-50">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-paper dark:bg-paper-dark border-t border-hairline dark:border-hairline-dark pt-2 pb-6 flex justify-around z-50">
       {TABS.map(({ id, Icon, label, suffix }) => {
         const href = `/trips/${tripId}${suffix ? `/${suffix}` : ''}`
         const active =

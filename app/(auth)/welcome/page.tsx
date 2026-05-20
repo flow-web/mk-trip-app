@@ -26,12 +26,12 @@ export default function WelcomePage() {
 
   return (
     <div>
-      <div className="mk-eyebrow text-ink-mute">MK TRIP</div>
+      <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark">MK TRIP</div>
       <h1 className="mk-display text-5xl mt-3">
         Le carnet<br />de bord<br />
         <span className="mk-display-italic" style={{ color: '#C75A20' }}>du crew.</span>
       </h1>
-      <p className="text-ink-soft mt-6 text-sm">
+      <p className="text-ink-soft dark:text-ink-soft-dark mt-6 text-sm">
         Reçois un lien magique par email pour te connecter.
       </p>
       <form onSubmit={onSubmit} className="mt-8 space-y-3">

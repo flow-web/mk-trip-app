@@ -6,6 +6,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { BookOpen, Calendar, Home, Map, Plus, Wallet } from 'lucide-react'
 import { db } from '@/lib/db'
 import { accentFor } from '@/lib/design/accent'
+import { ThemeToggle } from '@/components/design/ThemeToggle'
 import type { Database } from '@/lib/supabase/types'
 
 type TripType = Database['public']['Enums']['trip_type']
@@ -30,7 +31,7 @@ export function SideRail({
   const trips = useLiveQuery(() => db.trips.toArray()) ?? []
 
   return (
-    <aside className="hidden md:flex w-60 flex-col border-r border-hairline bg-paper p-5 gap-6 sticky top-0 h-screen">
+    <aside className="hidden md:flex w-60 flex-col border-r border-hairline dark:border-hairline-dark bg-paper dark:bg-paper-dark p-5 gap-6 sticky top-0 h-screen">
       <div className="flex items-center gap-2.5">
         <div className="w-9 h-9 bg-ink rounded-sm flex items-center justify-center">
           <span className="mk-display text-paper text-lg">MK</span>
@@ -39,7 +40,7 @@ export function SideRail({
       </div>
 
       <div>
-        <div className="mk-eyebrow text-ink-mute mb-2">VOYAGES · {trips.length}</div>
+        <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark mb-2">VOYAGES · {trips.length}</div>
         {trips.map((t) => {
           const a = accentFor(t.trip_type)
           const isActive = t.id === tripId
@@ -61,7 +62,7 @@ export function SideRail({
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium truncate">{t.name}</div>
-                <div className="mk-mono text-[9px] text-ink-mute">
+                <div className="mk-mono text-[9px] text-ink-mute dark:text-ink-mute-dark">
                   {t.trip_type.toUpperCase()}
                 </div>
               </div>
@@ -76,13 +77,14 @@ export function SideRail({
         })}
         <Link
           href={'/trips/new' as any}
-          className="flex items-center gap-2 px-2 py-2 text-ink-mute text-sm"
+          className="flex items-center gap-2 px-2 py-2 text-ink-mute dark:text-ink-mute-dark text-sm"
         >
           <Plus className="w-3.5 h-3.5" /> Nouveau voyage
         </Link>
       </div>
 
       <div className="mt-auto flex flex-col gap-0.5">
+        <ThemeToggle />
         {NAV.map(({ Icon, label, suffix }) => {
           const href = `/trips/${tripId}${suffix ? `/${suffix}` : ''}`
           const active =

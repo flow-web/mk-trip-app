@@ -35,7 +35,7 @@ export function TimelineEvent({
           {time}
         </div>
         {duration && (
-          <div className="mk-mono text-[9px] text-ink-mute mt-0.5">
+          <div className="mk-mono text-[9px] text-ink-mute dark:text-ink-mute-dark mt-0.5">
             {duration}
           </div>
         )}
@@ -70,7 +70,7 @@ export function TimelineEvent({
           {title}
         </div>
         {subtitle && (
-          <div className="text-xs text-ink-soft mt-0.5">{subtitle}</div>
+          <div className="text-xs text-ink-soft dark:text-ink-soft-dark mt-0.5">{subtitle}</div>
         )}
       </div>
     </div>

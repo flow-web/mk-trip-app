@@ -58,7 +58,7 @@ export function AddExpenseDialog({ tripId, currency, members }: Props) {
         Ajouter une dépense
       </DialogTrigger>
       <DialogContent className="max-w-md md:max-w-lg p-6">
-        <div className="mk-eyebrow text-ink-mute">NOUVELLE DÉPENSE</div>
+        <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark">NOUVELLE DÉPENSE</div>
         <h2 className="mk-display text-3xl mt-2">Combien ?</h2>
         <div className="mt-6 space-y-3">
           <Input

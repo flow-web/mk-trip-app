@@ -22,6 +22,8 @@ const config: Config = {
         'ink-dark': MK.inkDark,
         'ink-soft-dark': MK.inkSoftDark,
         'ink-mute-dark': MK.inkMuteDark,
+        'hairline-dark': MK.hairlineDark,
+        'hairline-strong-dark': MK.hairlineStrongDark,
 
         danger: MK.danger,
         ok: MK.ok,

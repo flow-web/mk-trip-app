@@ -53,7 +53,7 @@ export default function PlanningPage() {
   }
 
   return (
-    <main className="min-h-screen bg-paper pb-24">
+    <main className="min-h-screen bg-paper dark:bg-paper-dark pb-24">
       <div className="pt-12 px-5">
         <TripSwitcher
           tone="light"
@@ -63,7 +63,7 @@ export default function PlanningPage() {
         />
       </div>
       <div className="px-5 mt-4">
-        <Eyebrow className="text-ink-mute">PLANNING</Eyebrow>
+        <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">PLANNING</Eyebrow>
         <div className="flex items-baseline gap-3 mt-2">
           <span className="mk-display text-4xl">
             {day.date
@@ -81,7 +81,7 @@ export default function PlanningPage() {
           </span>
         </div>
         {day.zone && (
-          <div className="text-sm text-ink-soft mt-0.5">{day.zone}</div>
+          <div className="text-sm text-ink-soft dark:text-ink-soft-dark mt-0.5">{day.zone}</div>
         )}
         <WeekStrip
           days={days.map((d) => ({

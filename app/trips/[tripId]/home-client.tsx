@@ -113,7 +113,7 @@ export function HomeClient({
     daysTotal > 0 ? `JOUR ${daysElapsed} / ${daysTotal}` : 'JOUR — / —'
 
   return (
-    <main className="min-h-screen bg-paper flex flex-col pb-24 md:pb-0">
+    <main className="min-h-screen bg-paper dark:bg-paper-dark flex flex-col pb-24 md:pb-0">
       <Hero
         photo={heroUrl}
         accent={accent}

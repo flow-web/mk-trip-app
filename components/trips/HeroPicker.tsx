@@ -20,7 +20,7 @@ export function HeroPicker({ type, value, onChange, onFileSelected }: Props) {
 
   return (
     <div>
-      <div className="mk-eyebrow text-ink-mute mb-2">PHOTO DE COUVERTURE</div>
+      <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark mb-2">PHOTO DE COUVERTURE</div>
       <div className="grid grid-cols-3 gap-2">
         {defaults.map((url) => (
           <button
@@ -46,7 +46,7 @@ export function HeroPicker({ type, value, onChange, onFileSelected }: Props) {
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="mt-2 w-full h-12 border border-dashed border-hairline-strong rounded-sm flex items-center justify-center gap-2 text-sm text-ink-soft"
+        className="mt-2 w-full h-12 border border-dashed border-hairline-strong dark:border-hairline-strong-dark rounded-sm flex items-center justify-center gap-2 text-sm text-ink-soft dark:text-ink-soft-dark"
       >
         <Upload className="w-4 h-4" />
         Uploader la mienne

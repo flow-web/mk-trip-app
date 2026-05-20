@@ -73,8 +73,8 @@ export default function NewTripPage() {
   }
 
   return (
-    <main className="min-h-screen bg-paper p-5 pb-24">
-      <div className="mk-eyebrow text-ink-mute">NOUVEAU VOYAGE</div>
+    <main className="min-h-screen bg-paper dark:bg-paper-dark p-5 pb-24">
+      <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark">NOUVEAU VOYAGE</div>
       <h1 className="mk-display text-3xl mt-2">On part où ?</h1>
 
       <div className="mt-6 space-y-3">

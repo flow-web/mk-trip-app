@@ -24,11 +24,11 @@ export function MapSheet({ accent, spots, currentDayLabel }: Props) {
   return (
     <Drawer.Root open dismissible={false} modal={false}>
       <Drawer.Portal>
-        <Drawer.Content className="fixed bottom-0 left-0 right-0 max-h-[65%] bg-white rounded-t-[16px] shadow-sheet outline-none">
+        <Drawer.Content className="fixed bottom-0 left-0 right-0 max-h-[65%] bg-white dark:bg-paper-dark-deep rounded-t-[16px] shadow-sheet outline-none">
           <div className="w-[38px] h-1 bg-hairline-strong rounded-full mx-auto mt-3 mb-3.5" />
           <div className="px-5 flex items-center justify-between">
             <div>
-              <Eyebrow className="text-ink-mute">
+              <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">
                 {currentDayLabel ?? 'TOUS LES SPOTS'}
               </Eyebrow>
               <div className="font-display font-bold text-lg mt-0.5">
@@ -61,7 +61,7 @@ export function MapSheet({ accent, spots, currentDayLabel }: Props) {
               <li
                 key={s.id}
                 className={`flex items-center gap-3 py-3 ${
-                  i ? 'border-t border-hairline' : ''
+                  i ? 'border-t border-hairline dark:border-hairline-dark' : ''
                 }`}
               >
                 <div
@@ -72,7 +72,7 @@ export function MapSheet({ accent, spots, currentDayLabel }: Props) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium truncate">{s.name}</div>
-                  <div className="mk-mono text-[10px] text-ink-mute mt-0.5">
+                  <div className="mk-mono text-[10px] text-ink-mute dark:text-ink-mute-dark mt-0.5">
                     {s.category.toUpperCase()}
                   </div>
                 </div>

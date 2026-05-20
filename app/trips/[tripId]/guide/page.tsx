@@ -42,7 +42,7 @@ export default function GuidePage() {
   }
 
   return (
-    <main className="min-h-screen bg-paper pb-24">
+    <main className="min-h-screen bg-paper dark:bg-paper-dark pb-24">
       <div className="pt-12 px-5">
         <TripSwitcher
           tone="light"
@@ -52,14 +52,14 @@ export default function GuidePage() {
         />
       </div>
       <div className="px-5 mt-4">
-        <Eyebrow className="text-ink-mute">CARNET</Eyebrow>
+        <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">CARNET</Eyebrow>
         <h1 className="mk-display text-4xl mt-1">
           Le guide<br />
           <span className="mk-display-italic" style={{ color: accent.base }}>
             {trip.destination ?? trip.name}.
           </span>
         </h1>
-        <p className="text-sm text-ink-soft mt-2 max-w-[280px]">
+        <p className="text-sm text-ink-soft dark:text-ink-soft-dark mt-2 max-w-[280px]">
           Pratique, lexique, matos.
         </p>
 
@@ -94,7 +94,7 @@ export default function GuidePage() {
 
         {guideCards.length > 0 && (
           <div className="mt-7">
-            <Eyebrow className="text-ink-mute">NOTES DU CREW</Eyebrow>
+            <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">NOTES DU CREW</Eyebrow>
             <div className="mt-3">
               {guideCards.map((g) => (
                 <CrewNote
