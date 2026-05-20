@@ -29,4 +29,9 @@ export const MK = {
   ok: '#5A6E3E',
 } as const
 
-export type AccentTokens = typeof MK.skate
+export type AccentTokens = {
+  base: string
+  deep: string
+  tint: string
+  tintDark: string
+}

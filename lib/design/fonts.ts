@@ -5,7 +5,18 @@ export const display = Bricolage_Grotesque({
   subsets: ['latin'],
   variable: '--font-display',
   weight: ['500', '700', '800'],
-  style: ['normal', 'italic'],
+  style: 'normal',
+  display: 'swap',
+})
+
+// Bricolage Grotesque has no italic variant on Google Fonts.
+// We declare a separate font instance for the --font-display-italic CSS variable;
+// CSS will apply font-style: italic, which triggers synthetic italic rendering.
+export const displayItalic = Bricolage_Grotesque({
+  subsets: ['latin'],
+  variable: '--font-display-italic',
+  weight: ['500'],
+  style: 'normal',
   display: 'swap',
 })
 
