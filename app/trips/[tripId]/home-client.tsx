@@ -60,6 +60,50 @@ export function HomeClient({
     (a) => !completedActivityIds.has(a.id),
   ).length
 
+  const expenses = useLiveQuery(
+    () => db.expenses.where({ trip_id: tripId }).toArray(),
+    [tripId],
+  ) ?? []
+  const days = useLiveQuery(
+    () => db.days.where({ trip_id: tripId }).toArray(),
+    [tripId],
+  ) ?? []
+  const allActivities = useLiveQuery(async () => {
+    const dayIds = days.map((d) => d.id)
+    if (!dayIds.length) return []
+    return db.activities.where('day_id').anyOf(dayIds).toArray()
+  }, [days]) ?? []
+  const allCompletedIds = useLiveQuery(async () => {
+    const ids = allActivities.map((a) => a.id)
+    if (!ids.length) return new Set<string>()
+    const comps = await db.activity_completions
+      .where('activity_id')
+      .anyOf(ids)
+      .toArray()
+    return new Set(comps.map((c) => c.activity_id))
+  }, [allActivities]) ?? new Set<string>()
+
+  const totalSpent = expenses.reduce((s, e) => s + (e.amount ?? 0), 0) / 100
+  const budget = trip.total_budget ?? 0
+  const spotsTotal = allActivities.length
+  const spotsDone = allActivities.filter((a) => allCompletedIds.has(a.id)).length
+  const daysTotal = days.length
+  const daysElapsed = trip.start_date
+    ? Math.max(
+        0,
+        Math.min(
+          daysTotal,
+          Math.floor((Date.now() - new Date(trip.start_date).getTime()) / 86_400_000) + 1,
+        ),
+      )
+    : 0
+
+  const stats = [
+    { label: 'jours', val: `${daysElapsed} / ${daysTotal}`, unit: '' },
+    { label: 'spots faits', val: `${spotsDone} / ${spotsTotal}`, unit: '' },
+    { label: 'budget', val: totalSpent.toFixed(0), unit: budget ? `/ ${budget}€` : '€' },
+  ]
+
   return (
     <main className="min-h-screen bg-paper flex flex-col pb-24 md:pb-0">
       <section className="relative h-[420px] md:h-[480px] w-full overflow-hidden">
@@ -186,7 +230,25 @@ export function HomeClient({
           </div>
         </div>
       </section>
-      {/* Crew stats — Task 20 */}
+      <section className="px-5 mt-8">
+        <div className="mk-eyebrow text-ink-mute">LE CREW EN CHIFFRES</div>
+        <div className="mt-3 bg-white rounded-md border border-hairline overflow-hidden">
+          {stats.map((s, i) => (
+            <div
+              key={s.label}
+              className={`flex items-baseline justify-between px-4 py-3.5 ${
+                i ? 'border-t border-hairline' : ''
+              }`}
+            >
+              <div className="text-sm text-ink-soft">{s.label}</div>
+              <div className="flex items-baseline gap-1">
+                <div className="mk-display text-2xl">{s.val}</div>
+                {s.unit && <div className="mk-mono text-xs text-ink-mute">{s.unit}</div>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
       {/* Quick actions — Task 21 */}
     </main>
   )
