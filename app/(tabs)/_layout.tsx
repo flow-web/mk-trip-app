@@ -1,6 +1,11 @@
-import { Tabs } from "expo-router";
+import { Tabs, Redirect } from "expo-router";
+import { use$ } from "@legendapp/state/react";
+import { auth$ } from "../../store/auth$";
 
 export default function TabsLayout() {
+  const session = use$(auth$.session);
+  if (!session) return <Redirect href="/(auth)/welcome" />;
+
   return (
     <Tabs
       screenOptions={{
