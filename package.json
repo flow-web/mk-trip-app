@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~55.0.11",
-    "@legendapp/state": "^2.1.15",
+    "@legendapp/state": "^3.0.0-beta.47",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@supabase/supabase-js": "^2.106.1",
     "babel-preset-expo": "^55.0.10",
