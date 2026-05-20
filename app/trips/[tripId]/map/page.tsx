@@ -6,6 +6,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/db'
 import { accentFor } from '@/lib/design/accent'
 
+import { MapSheet } from '@/components/map/MapSheet'
+
 const MapView = dynamic(
   () => import('@/components/map/MapView').then((m) => m.MapView),
   { ssr: false },
@@ -35,7 +37,14 @@ export default function MapPage() {
       <div className="flex-1 relative">
         <MapView accent={accent} spots={geoSpots} />
       </div>
-      {/* MapSheet — Task 30 */}
+      <MapSheet
+        accent={accent}
+        spots={spots.map((s) => ({
+          id: s.id,
+          name: s.name,
+          category: s.category,
+        }))}
+      />
     </main>
   )
 }
