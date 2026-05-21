@@ -61,10 +61,16 @@ export async function flush(): Promise<void> {
         if (error) throw error
         serverRow = data
       } else if (entry.op === 'update') {
-        const { error } = await sb.from(entry.table).update(entry.payload).eq('id', entry.row_id)
+        const q = entry.composite_keys
+          ? sb.from(entry.table).update(entry.payload).match(entry.composite_keys)
+          : sb.from(entry.table).update(entry.payload).eq('id', entry.row_id)
+        const { error } = await q
         if (error) throw error
       } else if (entry.op === 'delete') {
-        const { error } = await sb.from(entry.table).delete().eq('id', entry.row_id)
+        const q = entry.composite_keys
+          ? sb.from(entry.table).delete().match(entry.composite_keys)
+          : sb.from(entry.table).delete().eq('id', entry.row_id)
+        const { error } = await q
         if (error) throw error
       }
 

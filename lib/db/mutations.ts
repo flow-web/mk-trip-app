@@ -1,10 +1,4 @@
 // lib/db/mutations.ts
-// TODO Phase 5.5: improve delete for composite-PK tables (activity_completions,
-// checklist_completions, expense_splits). The current implementation enqueues a
-// delete with row_id = the parent UUID, but the server delete uses .eq('id', row_id)
-// which doesn't address composite keys. To fix : extend SyncQueueEntry with a
-// `composite_keys` field for these tables, and adjust the queue.flush logic.
-
 import { db } from './index'
 import { enqueue, flush } from './queue'
 import type { Database } from '@/lib/supabase/types'
@@ -98,6 +92,7 @@ export const mutations = {
           table: 'activity_completions',
           payload: { activity_id: activityId, user_id: userId },
           row_id: activityId,
+          composite_keys: { activity_id: activityId, user_id: userId },
         })
         flush()
       }
@@ -118,6 +113,7 @@ export const mutations = {
           table: 'checklist_completions',
           payload: { item_id: itemId, user_id: userId },
           row_id: itemId,
+          composite_keys: { item_id: itemId, user_id: userId },
         })
         flush()
       }

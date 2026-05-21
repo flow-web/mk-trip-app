@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed:portugal": "tsx --env-file=.env.local scripts/seed-portugal.ts",
     "seed:sudouest": "tsx --env-file=.env.local scripts/seed-sudouest.ts",
     "db:types": "supabase gen types typescript --project-id $SUPABASE_PROJECT_REF > lib/supabase/types.ts"
   },

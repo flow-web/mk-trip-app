@@ -33,6 +33,10 @@ export interface SyncQueueEntry {
   payload: Record<string, unknown>
   row_id: string              // id de la row touchée (temp_id si insert, id réel sinon)
   depends_on?: string[]       // ids d'autres SyncQueueEntry à attendre
+  // Pour les tables à PK composée (activity_completions, checklist_completions,
+  // expense_splits) : map des colonnes PK → valeur. Si présent, queue.flush
+  // l'utilise avec .match() au lieu de .eq('id', row_id).
+  composite_keys?: Record<string, string>
   created_at: number
   status: SyncQueueStatus
   attempts: number
