@@ -19,19 +19,21 @@ const TABS = [
 export function BottomTab({
   tripId,
   tripType,
+  basePath = '/trips',
 }: {
   tripId: string
   tripType: TripType
+  basePath?: '/trips' | '/demo'
 }) {
   const path = usePathname()
   const accent = accentFor(tripType)
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-paper dark:bg-paper-dark border-t border-hairline dark:border-hairline-dark pt-2 pb-6 flex justify-around z-50">
       {TABS.map(({ id, Icon, label, suffix }) => {
-        const href = `/trips/${tripId}${suffix ? `/${suffix}` : ''}`
+        const href = `${basePath}/${tripId}${suffix ? `/${suffix}` : ''}`
         const active =
           suffix === ''
-            ? path === `/trips/${tripId}`
+            ? path === `${basePath}/${tripId}`
             : path.endsWith(`/${suffix}`)
         const color = active ? accent.base : '#7A6F60'
         return (

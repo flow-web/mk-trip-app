@@ -22,13 +22,19 @@ const NAV = [
 export function SideRail({
   tripId,
   tripType,
+  basePath = '/trips',
 }: {
   tripId: string
   tripType: TripType
+  basePath?: '/trips' | '/demo'
 }) {
   const path = usePathname()
   const accent = accentFor(tripType)
-  const trips = useLiveQuery(() => db.trips.toArray()) ?? []
+  const allTrips = useLiveQuery(() => db.trips.toArray()) ?? []
+  const isDemo = basePath === '/demo'
+  const trips = allTrips.filter((t) =>
+    isDemo ? t.id.startsWith('demo-trip-') : !t.id.startsWith('demo-trip-'),
+  )
 
   return (
     <aside className="hidden md:flex w-60 flex-col border-r border-hairline dark:border-hairline-dark bg-paper dark:bg-paper-dark p-5 gap-6 sticky top-0 h-screen">
@@ -48,7 +54,7 @@ export function SideRail({
           return (
             <Link
               key={t.id}
-              href={`/trips/${t.id}` as any}
+              href={`${basePath}/${t.id}` as any}
               className="flex items-center gap-2.5 px-2 py-2 rounded-sm mb-1"
               style={{
                 background: isActive ? '#fff' : 'transparent',
@@ -76,21 +82,23 @@ export function SideRail({
             </Link>
           )
         })}
-        <Link
-          href={'/trips/new' as any}
-          className="flex items-center gap-2 px-2 py-2 text-ink-mute dark:text-ink-mute-dark text-sm"
-        >
-          <Plus className="w-3.5 h-3.5" /> Nouveau voyage
-        </Link>
+        {!isDemo && (
+          <Link
+            href={'/trips/new' as any}
+            className="flex items-center gap-2 px-2 py-2 text-ink-mute dark:text-ink-mute-dark text-sm"
+          >
+            <Plus className="w-3.5 h-3.5" /> Nouveau voyage
+          </Link>
+        )}
       </div>
 
       <div className="mt-auto flex flex-col gap-0.5">
         <ThemeToggle />
         {NAV.map(({ Icon, label, suffix }) => {
-          const href = `/trips/${tripId}${suffix ? `/${suffix}` : ''}`
+          const href = `${basePath}/${tripId}${suffix ? `/${suffix}` : ''}`
           const active =
             suffix === ''
-              ? path === `/trips/${tripId}`
+              ? path === `${basePath}/${tripId}`
               : path.endsWith(`/${suffix}`)
           return (
             <Link
