@@ -105,10 +105,11 @@ export function HomeClient({
     { label: 'budget', val: totalSpent.toFixed(0), unit: budget ? `/ ${budget}€` : '€' },
   ]
 
+  const typeLabel = (trip.trip_type ?? 'other').toUpperCase()
   const heroEyebrow =
     trip.start_date && trip.end_date
-      ? `${trip.trip_type.toUpperCase()} · ${formatRange(trip.start_date, trip.end_date)}`
-      : trip.trip_type.toUpperCase()
+      ? `${typeLabel} · ${formatRange(trip.start_date, trip.end_date)}`
+      : typeLabel
   const heroBadge =
     daysTotal > 0 ? `JOUR ${daysElapsed} / ${daysTotal}` : 'JOUR — / —'
 

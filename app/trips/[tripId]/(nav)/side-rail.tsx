@@ -42,6 +42,7 @@ export function SideRail({
       <div>
         <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark mb-2">VOYAGES · {trips.length}</div>
         {trips.map((t) => {
+          if (!t.trip_type) return null
           const a = accentFor(t.trip_type)
           const isActive = t.id === tripId
           return (
@@ -63,7 +64,7 @@ export function SideRail({
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium truncate">{t.name}</div>
                 <div className="mk-mono text-[9px] text-ink-mute dark:text-ink-mute-dark">
-                  {t.trip_type.toUpperCase()}
+                  {(t.trip_type ?? 'other').toUpperCase()}
                 </div>
               </div>
               {isActive && (

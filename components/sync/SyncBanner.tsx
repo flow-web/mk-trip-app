@@ -1,13 +1,17 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { AlertTriangle, RefreshCw, WifiOff } from 'lucide-react'
 import { useSyncStatus } from '@/lib/stores/syncStatus'
 
 export function SyncBanner() {
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
   const { online, queueLength, failedCount } = useSyncStatus()
   const { tripId } = useParams<{ tripId: string }>()
+  if (!mounted) return null
   if (online && queueLength === 0) return null
 
   const tone = failedCount > 0 ? 'danger' : !online ? 'warn' : 'info'
