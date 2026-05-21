@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MK Trip — Refonte UI</title>
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #f0eee9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  #root { height: 100%; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel" src="moodboard.jsx"></script>
+<script type="text/babel" src="tokens.jsx"></script>
+<script type="text/babel" src="screens.jsx"></script>
+<script type="text/babel" src="screens2.jsx"></script>
+<script type="text/babel" src="variants.jsx"></script>
+
+<script type="text/babel">
+  const App = () => (
+    <DesignCanvas>
+      <DCSection id="direction" title="01 · Direction artistique" subtitle="L'ADN visuel — photo plein cadre, charbon + sable, 4 accents par type">
+        <DCArtboard id="moodboard" label="Moodboard · ADN" width={1280} height={800}>
+          <Moodboard />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="tokens" title="02 · Design tokens" subtitle="Couleurs, typo, spacing 4pt, radius 8/12/24, élévations subtiles">
+        <DCArtboard id="tokens" label="Tokens" width={1280} height={800}>
+          <Tokens />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="screens-mobile" title="03 · Les 5 écrans · mobile light" subtitle="375 × 812 · variante skate (orange brûlé) comme baseline">
+        <DCArtboard id="home"    label="Home · Dashboard"    width={375} height={812}><HomeScreen /></DCArtboard>
+        <DCArtboard id="map"     label="Map · Itinéraire"    width={375} height={812}><MapScreen /></DCArtboard>
+        <DCArtboard id="plan"    label="Planning · Jour 3"   width={375} height={812}><PlanningScreen /></DCArtboard>
+        <DCArtboard id="budget"  label="Split · Qui doit qui" width={375} height={812}><BudgetScreen /></DCArtboard>
+        <DCArtboard id="guide"   label="Guide · Carnet"      width={375} height={812}><GuideScreen /></DCArtboard>
+      </DCSection>
+
+      <DCSection id="home-variants" title="04 · Le même squelette, 3 voyages" subtitle="Skate Sud-Ouest · Rando GR20 · City Lisboa. Même structure, accent + imagerie changent.">
+        <DCArtboard id="skate"  label="Skate · Sud-Ouest"      width={375} height={812}><HomeScreen /></DCArtboard>
+        <DCArtboard id="rando"  label="Rando · GR20 Corse"     width={375} height={812}><HomeRando /></DCArtboard>
+        <DCArtboard id="city"   label="City break · Lisboa"    width={375} height={812}><HomeCity /></DCArtboard>
+      </DCSection>
+
+      <DCSection id="home-modes" title="05 · Home — dark mode + desktop" subtitle="Même qualité en dark. Rail gauche persistant en desktop.">
+        <DCArtboard id="dark"    label="Home · Dark"          width={375} height={812}><HomeDark /></DCArtboard>
+        <DCArtboard id="desktop" label="Home · Desktop 1280"  width={1280} height={800}><HomeDesktop /></DCArtboard>
+      </DCSection>
+
+      <DCSection id="components" title="06 · Composants détaillés" subtitle="Spot card · Expense row (3 états) · Map pin par catégorie">
+        <DCArtboard id="spot"    label="Spot card"            width={320} height={380}><SpotCardDetail /></DCArtboard>
+        <DCArtboard id="expense" label="Expense row · états"  width={320} height={380}><ExpenseRowDetail /></DCArtboard>
+        <DCArtboard id="pin"     label="Map pin · catégories" width={320} height={380}><MapPinDetail /></DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

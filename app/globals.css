@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* shadcn HSL mappings vers nos tokens MK light */
+    --background: 39 32% 92%;        /* paper #F2EDE3 */
+    --foreground: 25 11% 10%;        /* ink #1C1A17 */
+    --card: 0 0% 100%;
+    --card-foreground: 25 11% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 25 11% 10%;
+    --primary: 25 11% 10%;
+    --primary-foreground: 39 32% 92%;
+    --secondary: 39 17% 83%;         /* sand */
+    --secondary-foreground: 25 11% 10%;
+    --muted: 39 17% 83%;
+    --muted-foreground: 30 12% 43%;  /* inkMute */
+    --accent: 39 17% 83%;
+    --accent-foreground: 25 11% 10%;
+    --destructive: 8 56% 40%;        /* danger */
+    --destructive-foreground: 0 0% 98%;
+    --border: 25 11% 92%;
+    --input: 25 11% 92%;
+    --ring: 25 11% 10%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 35 22% 7%;         /* paperDark */
+    --foreground: 39 32% 92%;
+    --card: 35 19% 11%;
+    --card-foreground: 39 32% 92%;
+    --popover: 35 19% 11%;
+    --popover-foreground: 39 32% 92%;
+    --primary: 39 32% 92%;
+    --primary-foreground: 25 11% 10%;
+    --secondary: 32 18% 14%;
+    --secondary-foreground: 39 32% 92%;
+    --muted: 32 18% 14%;
+    --muted-foreground: 38 9% 49%;
+    --accent: 32 18% 14%;
+    --accent-foreground: 39 32% 92%;
+    --destructive: 8 56% 40%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 38 17% 18%;
+    --input: 38 17% 18%;
+    --ring: 39 32% 92%;
+  }
+
+  body {
+    @apply bg-paper text-ink font-body antialiased;
+    font-family: var(--font-body);
+  }
+  body.dark {
+    @apply bg-paper-dark text-ink-dark;
+  }
+}
+
+@layer components {
+  .mk-eyebrow {
+    @apply font-mono uppercase tracking-eyebrow text-[10px] font-medium;
+  }
+  .mk-display {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 0.95;
+  }
+  .mk-display-italic {
+    font-family: var(--font-display-italic);
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .mk-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .mk-noscroll::-webkit-scrollbar { display: none; }
+  .mk-noscroll { scrollbar-width: none; }
+}
