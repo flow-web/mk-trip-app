@@ -1,1 +1,4 @@
-export { default } from '@/app/trips/[tripId]/planning/page'
+'use client'
+
+import PlanningPage from '@/app/trips/[tripId]/planning/page'
+export default PlanningPage

@@ -1,1 +1,4 @@
-export { default } from '@/app/trips/[tripId]/guide/page'
+'use client'
+
+import GuidePage from '@/app/trips/[tripId]/guide/page'
+export default GuidePage
