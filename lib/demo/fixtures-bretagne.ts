@@ -514,6 +514,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s1`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Gîte Les Hortensias',
     description: 'Maison bretonne 4 chambres avec jardin, à 10 min à pied de la plage',
     category: 'accommodation',
@@ -528,6 +529,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s2`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Plage de Trestraou',
     description: 'Grande plage de sable fin, idéale pour les enfants, eau surveillée',
     category: 'nature',
@@ -542,6 +544,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s3`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Sentier des Douaniers — Ploumanac\'h',
     description: 'Sentier côtier entre chaos de granit rose, 7 km, tous niveaux',
     category: 'nature',
@@ -556,6 +559,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s4`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Phare de Mean Ruz',
     description: 'Phare rouge au milieu des rochers roses, emblème de Ploumanac\'h',
     category: 'culture',
@@ -570,6 +574,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s5`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Île de Bréhat',
     description: 'Île sans voitures couverte de fleurs, traversée en vedette depuis l\'Arcouest',
     category: 'nature',
@@ -584,6 +589,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s6`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Marché de Roscoff',
     description: 'Marché du mardi matin, producteurs locaux, oignons roses AOP',
     category: 'food',
@@ -598,6 +604,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s7`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Château de Tonquédec',
     description: 'Ruines médiévales du XIVe siècle, accès libre dans la végétation',
     category: 'culture',
@@ -612,6 +619,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s8`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Cap Fréhel',
     description: 'Falaises de 70 m, landes de bruyère, vue sur les îles anglo-normandes',
     category: 'nature',
@@ -626,6 +634,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s9`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Fort La Latte',
     description: 'Château médiéval sur éperon rocheux dominant la mer, XVIe siècle',
     category: 'culture',
@@ -640,6 +649,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s10`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Remparts de Saint-Malo',
     description: 'Tour complet des remparts, 1h30 de marche avec vues sur la mer',
     category: 'culture',
@@ -654,6 +664,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s11`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Plage du Sillon',
     description: 'Longue plage de sable à 5 min des remparts, très animée en été',
     category: 'nature',
@@ -668,6 +679,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s12`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Crêperie Ahna — Dinan',
     description: 'Crêperie dans une maison à colombages du XVe, galettes au sarrasin local',
     category: 'food',
@@ -682,6 +694,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s13`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Crêperie du Port — Perros-Guirec',
     description: 'Adresse locale vue sur le port, galettes complètes et kouign-amann maison',
     category: 'food',
@@ -696,6 +709,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s14`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Mini-golf de Trestraou',
     description: '18 trous face à la mer, parfait pour les enfants, géré par la mairie',
     category: 'activity',
@@ -710,6 +724,7 @@ export const bretagneSpots: LocalSpot[] = [
   {
     id: `${BRETAGNE}-s15`,
     trip_id: BRETAGNE,
+    day_id: null,
     name: 'Château de Dinan',
     description: 'Tour de l\'Horloge et musée retraçant l\'histoire de la ville médiévale',
     category: 'culture',
