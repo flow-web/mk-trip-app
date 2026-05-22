@@ -42,6 +42,9 @@ export class MKTripDB extends Dexie {
       sync_queue: 'id, status, created_at, row_id',
       pending_uploads: 'id, trip_id, status, created_at',
     })
+    this.version(2).stores({
+      spots: 'id, trip_id, category, day_id',
+    })
   }
 }
 
