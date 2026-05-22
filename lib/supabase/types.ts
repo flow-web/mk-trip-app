@@ -198,6 +198,7 @@ export type Database = {
         Row: {
           id: string
           trip_id: string
+          day_id: string | null
           name: string
           description: string | null
           category: Database['public']['Enums']['spot_category']
@@ -212,6 +213,7 @@ export type Database = {
         Insert: {
           id?: string
           trip_id: string
+          day_id?: string | null
           name: string
           description?: string | null
           category?: Database['public']['Enums']['spot_category']
@@ -226,6 +228,7 @@ export type Database = {
         Update: {
           id?: string
           trip_id?: string
+          day_id?: string | null
           name?: string
           description?: string | null
           category?: Database['public']['Enums']['spot_category']
