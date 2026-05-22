@@ -1,11 +1,12 @@
 'use client'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
-import { Map, NavigationControl } from 'react-map-gl'
-import type { SegmentWithStats } from '@/lib/segments/queries'
+import { Map, Marker, NavigationControl } from 'react-map-gl'
+import { ACTIVITY_COLORS } from '@/lib/segments/types'
+import type { SegmentPublic } from '@/lib/segments/queries'
 
 interface Props {
-  segments: SegmentWithStats[]
+  segments: SegmentPublic[]
   selectedId?: string | null
   onSelect?: (id: string) => void
   onMove?: (bbox: { minLng: number; minLat: number; maxLng: number; maxLat: number }) => void
@@ -37,9 +38,27 @@ export function SegmentMap({ segments, selectedId, onSelect, onMove, initialCent
       }}
     >
       <NavigationControl position="top-right" />
-      {segments.map(() => {
-        // Pins ajoutés en Task 12 quand la vue PostGIS expose start_lng/start_lat
-        return null
+      {segments.map((s) => {
+        const active = s.id === selectedId
+        return (
+          <Marker
+            key={s.id}
+            latitude={s.start_lat}
+            longitude={s.start_lng}
+            onClick={(e) => {
+              e.originalEvent.stopPropagation()
+              onSelect?.(s.id)
+            }}
+          >
+            <div
+              className="w-4 h-4 rounded-full border-2 border-white shadow cursor-pointer transition"
+              style={{
+                background: ACTIVITY_COLORS[s.activity],
+                transform: active ? 'scale(1.4)' : 'scale(1)',
+              }}
+            />
+          </Marker>
+        )
       })}
     </Map>
   )

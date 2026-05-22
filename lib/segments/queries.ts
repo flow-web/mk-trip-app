@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import type { ActivityKind } from './types'
 
-export interface SegmentWithStats {
+export interface SegmentPublic {
   id: string
   creator_id: string | null
   name: string
@@ -10,8 +10,12 @@ export interface SegmentWithStats {
   distance_m: number
   cover_color: string
   created_at: string
+  start_lng: number
+  start_lat: number
+  end_lng: number
+  end_lat: number
+  geom_geojson: GeoJSON.LineString
   run_count: number
-  best_duration_ms: number | null
 }
 
 export async function listSegmentsInBounds(opts: {
@@ -21,11 +25,15 @@ export async function listSegmentsInBounds(opts: {
   maxLat: number
   activity?: ActivityKind
   limit?: number
-}): Promise<SegmentWithStats[]> {
+}): Promise<SegmentPublic[]> {
   const supabase = await createClient()
   let q = (supabase as any)
-    .from('segments')
-    .select('*, runs(count)')
+    .from('segments_public')
+    .select('*, runs:runs(count)')
+    .gte('start_lng', opts.minLng)
+    .lte('start_lng', opts.maxLng)
+    .gte('start_lat', opts.minLat)
+    .lte('start_lat', opts.maxLat)
     .limit(opts.limit ?? 500)
   if (opts.activity) q = q.eq('activity', opts.activity)
   const { data, error } = await q
@@ -39,8 +47,12 @@ export async function listSegmentsInBounds(opts: {
     distance_m: row.distance_m,
     cover_color: row.cover_color,
     created_at: row.created_at,
+    start_lng: row.start_lng,
+    start_lat: row.start_lat,
+    end_lng: row.end_lng,
+    end_lat: row.end_lat,
+    geom_geojson: row.geom_geojson,
     run_count: row.runs?.[0]?.count ?? 0,
-    best_duration_ms: null,
   }))
 }
 
