@@ -42,7 +42,7 @@ export function MapView({
 
   // Map day_id → index for color lookup
   const dayIndex = useMemo(() => {
-    const dayMap = new Map<string, number>()
+    const dayMap = new globalThis.Map<string, number>()
     days.forEach((d, i) => dayMap.set(d.id, i))
     return dayMap
   }, [days])
