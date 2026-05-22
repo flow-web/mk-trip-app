@@ -26,7 +26,7 @@ import {
   DEMO_PARTNER_ID,
   DEMO_CAMILLE_ID,
   DEMO_YANIS_ID,
-} from './fixtures'
+} from './ids'
 
 const NOW = new Date('2026-05-21T10:00:00Z').toISOString()
 const SK = 'demo-trip-skatepark'

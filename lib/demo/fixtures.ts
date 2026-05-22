@@ -63,14 +63,24 @@ import {
   bretagneGuide,
 } from './fixtures-bretagne'
 
-export const DEMO_USER_ID = 'demo-user-lina'
-export const DEMO_PARTNER_ID = 'demo-user-tom'
-// Amis (utilisés dans le voyage skatepark)
-export const DEMO_CAMILLE_ID = 'demo-user-camille'
-export const DEMO_YANIS_ID = 'demo-user-yanis'
-// Famille (utilisés dans le voyage Bretagne)
-export const DEMO_SAM_ID = 'demo-user-sam'
-export const DEMO_INES_ID = 'demo-user-ines'
+// IDs ré-exportés depuis ./ids pour préserver la rétro-compatibilité des imports
+// existants. Le module dédié ./ids brise le cycle fixtures ↔ fixtures-*.
+export {
+  DEMO_USER_ID,
+  DEMO_PARTNER_ID,
+  DEMO_CAMILLE_ID,
+  DEMO_YANIS_ID,
+  DEMO_SAM_ID,
+  DEMO_INES_ID,
+} from './ids'
+import {
+  DEMO_USER_ID,
+  DEMO_PARTNER_ID,
+  DEMO_CAMILLE_ID,
+  DEMO_YANIS_ID,
+  DEMO_SAM_ID,
+  DEMO_INES_ID,
+} from './ids'
 
 const NOW = new Date('2026-05-21T10:00:00Z').toISOString()
 

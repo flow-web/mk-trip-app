@@ -16,7 +16,7 @@ import type {
   LocalGuideCard,
 } from '@/lib/db/schema'
 
-import { DEMO_USER_ID } from './fixtures'
+import { DEMO_USER_ID } from './ids'
 
 const NOW = new Date('2026-05-21T10:00:00Z').toISOString()
 const TOKYO = 'demo-trip-tokyo'
