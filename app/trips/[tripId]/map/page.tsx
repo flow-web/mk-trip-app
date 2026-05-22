@@ -3,8 +3,10 @@
 import dynamic from 'next/dynamic'
 import { useParams } from 'next/navigation'
 import { useLiveQuery } from 'dexie-react-hooks'
+import Image from 'next/image'
 import { db } from '@/lib/db'
 import { accentFor } from '@/lib/design/accent'
+import { spotImageFor } from '@/lib/design/spot-image'
 
 import { MapSheet } from '@/components/map/MapSheet'
 
@@ -36,6 +38,7 @@ export default function MapPage() {
     id: s.id,
     name: s.name,
     category: s.category,
+    image: spotImageFor(s, trip.trip_type),
   }))
 
   return (
@@ -59,11 +62,14 @@ export default function MapPage() {
                   i ? 'border-t border-hairline dark:border-hairline-dark' : ''
                 }`}
               >
-                <div
-                  className="w-8 h-8 rounded-xs flex items-center justify-center"
-                  style={{ background: accent.base }}
-                >
-                  <span className="text-white text-xs">●</span>
+                <div className="relative w-12 h-12 rounded-xs overflow-hidden flex-none">
+                  <Image src={s.image} alt="" fill className="object-cover" unoptimized />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: `linear-gradient(135deg, ${accent.base}33 0%, transparent 60%)`,
+                    }}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium truncate">{s.name}</div>

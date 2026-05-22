@@ -12,10 +12,18 @@ export type LocalRow<T> = T & {
 export type LocalProfile = LocalRow<Tables['profiles']['Row']>
 export type LocalTrip = LocalRow<Tables['trips']['Row']>
 export type LocalTripMember = LocalRow<Tables['trip_members']['Row']>
-export type LocalDay = LocalRow<Tables['days']['Row']>
+// LocalDay : étendu avec `note` (souvenir/carnet de bord) — pas encore sur Supabase,
+// stocké uniquement côté Dexie pour l'instant. Sera migré quand le mode démo
+// sortira et qu'un vrai voyage aura besoin d'écrire des notes synchronisables.
+export type LocalDay = LocalRow<Tables['days']['Row']> & {
+  note?: string | null
+}
 export type LocalActivity = LocalRow<Tables['activities']['Row']>
 export type LocalActivityCompletion = LocalRow<Tables['activity_completions']['Row']>
-export type LocalSpot = LocalRow<Tables['spots']['Row']>
+// LocalSpot : étendu avec `image_url` (photo du spot). Même statut que note ci-dessus.
+export type LocalSpot = LocalRow<Tables['spots']['Row']> & {
+  image_url?: string | null
+}
 export type LocalExpense = LocalRow<Tables['expenses']['Row']>
 export type LocalExpenseSplit = LocalRow<Tables['expense_splits']['Row']>
 export type LocalChecklistItem = LocalRow<Tables['checklist_items']['Row']>

@@ -83,6 +83,24 @@ export default function PlanningPage() {
         {day.zone && (
           <div className="text-sm text-ink-soft dark:text-ink-soft-dark mt-0.5">{day.zone}</div>
         )}
+        {day.theme && (
+          <div className="mk-display-italic text-lg text-ink dark:text-ink-dark mt-1">
+            {day.theme}
+          </div>
+        )}
+        {day.note && (
+          <div
+            className="mt-4 p-4 rounded-xs bg-paper-deep dark:bg-paper-dark-deep border-l-2"
+            style={{ borderColor: accent.base }}
+          >
+            <div className="mk-mono text-[10px] mb-1.5" style={{ color: accent.base }}>
+              CARNET DE BORD
+            </div>
+            <p className="text-sm leading-relaxed text-ink-soft dark:text-ink-soft-dark whitespace-pre-line">
+              {day.note}
+            </p>
+          </div>
+        )}
         <WeekStrip
           days={days.map((d) => ({
             id: d.id,

@@ -206,7 +206,7 @@ export const demoTripMembers: LocalTripMember[] = [
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 type Cat = 'food' | 'culture' | 'nightlife' | 'nature' | 'accommodation' | 'activity' | 'sport'
 
-function mkDay(tripId: string, n: number, date: string, theme: string, zone?: string): LocalDay {
+function mkDay(tripId: string, n: number, date: string, theme: string, zone?: string, note?: string): LocalDay {
   return {
     id: `${tripId}-d${n}`,
     trip_id: tripId,
@@ -215,6 +215,7 @@ function mkDay(tripId: string, n: number, date: string, theme: string, zone?: st
     label: `Jour ${n}`,
     theme,
     zone: zone ?? null,
+    note: note ?? null,
     created_at: NOW,
     updated_at: NOW,
   }
@@ -477,12 +478,18 @@ const corseGuide: LocalGuideCard[] = [
 // ─── DOLOMITES (hike) ────────────────────────────────────────────────────────
 const DOLO = 'demo-trip-dolomites'
 const doloDays: LocalDay[] = [
-  mkDay(DOLO, 1, '2026-03-01', 'Lago di Braies → Sennes', 'Étape 1'),
-  mkDay(DOLO, 2, '2026-03-02', 'Sennes → Lavarella', 'Étape 2'),
-  mkDay(DOLO, 3, '2026-03-03', 'Lavarella → Lagazuoi', 'Étape 3'),
-  mkDay(DOLO, 4, '2026-03-04', 'Lagazuoi → Nuvolau', 'Étape 4'),
-  mkDay(DOLO, 5, '2026-03-05', 'Nuvolau → Coldai', 'Étape 5'),
-  mkDay(DOLO, 6, '2026-03-06', 'Coldai → La Pissa', 'Étape 6 — fin'),
+  mkDay(DOLO, 1, '2026-03-01', 'Lago di Braies → Sennes', 'Étape 1',
+    "Première montée raide, sacs trop chargés (on fera le tri demain). Le lac est aussi turquoise qu'on l'imaginait — mais la file de selfie-sticks à 9h, brutal. À midi on était seuls. Sennes : dortoir 6 places, ronfleur olympique au lit 3. Bière brune locale parfaite."),
+  mkDay(DOLO, 2, '2026-03-02', 'Sennes → Lavarella', 'Étape 2',
+    "Étape longue mais plate, on récupère. Premier coup d'œil sur les Tofane depuis Passo Limo — Tom a juste dit \"putain\". Pique-nique au lac Lavarella, eau glaciale. Bière de monastère le soir, le moine sourit en remplissant la chope."),
+  mkDay(DOLO, 3, '2026-03-03', 'Lavarella → Lagazuoi', 'Étape 3',
+    "Le jour qu'on redoutait. La Cengia del Banc avec les câbles : 15 min de pure adrénaline. Lagazuoi à 2752m, panorama vertigineux. Coucher de soleil rose sur les Tofane — le moment du voyage."),
+  mkDay(DOLO, 4, '2026-03-04', 'Lagazuoi → Nuvolau', 'Étape 4',
+    "Téléphérique pour descendre (genoux remercient). Tunnels Grande Guerre humides, ambiance étrange. Cinque Torri photogéniques, on fait nos influenceurs de la montagne. Nuvolau, le plus vieux refuge — patron grognon mais polenta divine."),
+  mkDay(DOLO, 5, '2026-03-05', 'Nuvolau → Coldai', 'Étape 5',
+    "Réveil 5h30 pour le lever de soleil sur la Tofana — vaut chaque minute de sommeil perdue. Descente Forcella Giau brutale (Lina a glissé deux fois, plus de peur que de mal). 14 km, on arrive cassés au lac Coldai, plongeon à 6°C, on hurle, on rit."),
+  mkDay(DOLO, 6, '2026-03-06', 'Coldai → La Pissa', 'Étape 6 — fin',
+    "Dernière étape, photo au Lago Coldai miroir (l'image qui sera imprimée). Forcella Col Negro tranquille. Café au Vazzoler avec une bande de grimpeurs allemands, on échange des contacts. La Pissa, bus pour Belluno, on a réussi."),
 ]
 
 const doloActivities: LocalActivity[] = [
