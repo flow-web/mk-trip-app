@@ -62,7 +62,7 @@ Le shell de la tab Map (`app/trips/[tripId]/map/page.tsx` ou équivalent) se com
 | Clic item liste sheet | Identique à clic pin |
 | Drag sheet vers haut | Snap `mid` → snap `full`, carte reste interactive |
 | Swipe down sheet détail | Ferme overlay, revient au sheet liste |
-| Tap "Marquer visité" | Toggle `activity_completions`, optimistic UI via Dexie + sync queue existant |
+| Tap "Marquer visité" | **Reporté hors-scope A** (nécessite décision schema : `activity_completions` lie les activities, pas les spots — voir plan §Ajustements). Bouton non rendu dans le sheet détail v1. |
 | Long press carte (zone vide) | **Hors scope A** (futur sous-projet création spot) |
 
 ## 6. Composants à créer / modifier
@@ -130,7 +130,7 @@ Sheet liste: visibleSpots triés par time
 2. Le day dock filtre correctement et anime le recentrage carte (fitBounds avec padding 50px).
 3. Les pins ont la bonne couleur (= jour) et icône (= catégorie).
 4. Cliquer un pin OU un item de liste ouvre le même sheet détail.
-5. "Marquer visité" met à jour `activity_completions` et l'UI reflète le changement offline (Dexie).
+5. ~~"Marquer visité" met à jour `activity_completions`~~ **Reporté** : nécessite décision schema (spots ≠ activities). Pas dans le scope du sous-projet A.
 6. Le sheet est draggable fluide entre 3 snap points sur iOS Safari et Android Chrome (60fps perceptible).
 7. Aucune régression visuelle ou fonctionnelle sur Home / Planning / Budget / Guide.
 
