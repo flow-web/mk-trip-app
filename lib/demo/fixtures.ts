@@ -22,8 +22,55 @@ import type {
   LocalGuideCard,
 } from '@/lib/db/schema'
 
+// Voyages additionnels — un fichier par voyage pour limiter la taille de ce module.
+import {
+  skateparkTrip,
+  skateparkMembers,
+  skateparkDays,
+  skateparkActivities,
+  skateparkCompletions,
+  skateparkSpots,
+  skateparkExpenses,
+  skateparkSplits,
+  skateparkChecklist,
+  skateparkChecklistDone,
+  skateparkGuide,
+} from './fixtures-skatepark'
+import {
+  tokyoTrip,
+  tokyoMembers,
+  tokyoDays,
+  tokyoActivities,
+  tokyoCompletions,
+  tokyoSpots,
+  tokyoExpenses,
+  tokyoSplits,
+  tokyoChecklist,
+  tokyoChecklistDone,
+  tokyoGuide,
+} from './fixtures-tokyo'
+import {
+  bretagneTrip,
+  bretagneMembers,
+  bretagneDays,
+  bretagneActivities,
+  bretagneCompletions,
+  bretagneSpots,
+  bretagneExpenses,
+  bretagneSplits,
+  bretagneChecklist,
+  bretagneChecklistDone,
+  bretagneGuide,
+} from './fixtures-bretagne'
+
 export const DEMO_USER_ID = 'demo-user-lina'
 export const DEMO_PARTNER_ID = 'demo-user-tom'
+// Amis (utilisés dans le voyage skatepark)
+export const DEMO_CAMILLE_ID = 'demo-user-camille'
+export const DEMO_YANIS_ID = 'demo-user-yanis'
+// Famille (utilisés dans le voyage Bretagne)
+export const DEMO_SAM_ID = 'demo-user-sam'
+export const DEMO_INES_ID = 'demo-user-ines'
 
 const NOW = new Date('2026-05-21T10:00:00Z').toISOString()
 
@@ -39,6 +86,34 @@ export const demoProfiles: LocalProfile[] = [
   {
     id: DEMO_PARTNER_ID,
     display_name: 'Tom Brel',
+    avatar_url: null,
+    created_at: NOW,
+    updated_at: NOW,
+  },
+  {
+    id: DEMO_CAMILLE_ID,
+    display_name: 'Camille Suarez',
+    avatar_url: null,
+    created_at: NOW,
+    updated_at: NOW,
+  },
+  {
+    id: DEMO_YANIS_ID,
+    display_name: 'Yanis Faraj',
+    avatar_url: null,
+    created_at: NOW,
+    updated_at: NOW,
+  },
+  {
+    id: DEMO_SAM_ID,
+    display_name: 'Sam Mouret',
+    avatar_url: null,
+    created_at: NOW,
+    updated_at: NOW,
+  },
+  {
+    id: DEMO_INES_ID,
+    display_name: 'Inès Mouret',
     avatar_url: null,
     created_at: NOW,
     updated_at: NOW,
@@ -98,13 +173,25 @@ export const demoTrips: LocalTrip[] = [
     created_at: NOW,
     updated_at: NOW,
   },
+  skateparkTrip,
+  tokyoTrip,
+  bretagneTrip,
 ]
 
 // ─── Trip Members ────────────────────────────────────────────────────────────
-export const demoTripMembers: LocalTripMember[] = demoTrips.flatMap((t) => [
-  { trip_id: t.id, user_id: DEMO_USER_ID, role: 'owner' as const, joined_at: NOW },
-  { trip_id: t.id, user_id: DEMO_PARTNER_ID, role: 'editor' as const, joined_at: NOW },
-])
+// Lisbonne / Corse / Dolomites = couple Lina+Tom (logique simple).
+// Les voyages additionnels (skatepark, tokyo, bretagne) ont leurs propres membres
+// car la composition diffère (4 amis / solo / famille 4 pers).
+const COUPLE_TRIP_IDS = ['demo-trip-lisboa', 'demo-trip-corse', 'demo-trip-dolomites']
+export const demoTripMembers: LocalTripMember[] = [
+  ...COUPLE_TRIP_IDS.flatMap((id) => [
+    { trip_id: id, user_id: DEMO_USER_ID, role: 'owner' as const, joined_at: NOW },
+    { trip_id: id, user_id: DEMO_PARTNER_ID, role: 'editor' as const, joined_at: NOW },
+  ]),
+  ...skateparkMembers,
+  ...tokyoMembers,
+  ...bretagneMembers,
+]
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 type Cat = 'food' | 'culture' | 'nightlife' | 'nature' | 'accommodation' | 'activity' | 'sport'
@@ -487,23 +574,42 @@ const doloGuide: LocalGuideCard[] = [
 ]
 
 // ─── EXPORTS AGRÉGÉS ─────────────────────────────────────────────────────────
-export const demoDays: LocalDay[] = [...lisboaDays, ...corseDays, ...doloDays]
-export const demoActivities: LocalActivity[] = [...lisboaActivities, ...corseActivities, ...doloActivities]
+export const demoDays: LocalDay[] = [
+  ...lisboaDays, ...corseDays, ...doloDays,
+  ...skateparkDays, ...tokyoDays, ...bretagneDays,
+]
+export const demoActivities: LocalActivity[] = [
+  ...lisboaActivities, ...corseActivities, ...doloActivities,
+  ...skateparkActivities, ...tokyoActivities, ...bretagneActivities,
+]
 export const demoActivityCompletions: LocalActivityCompletion[] = [
-  ...lisboaCompletions,
-  ...corseCompletions,
-  ...doloCompletions,
+  ...lisboaCompletions, ...corseCompletions, ...doloCompletions,
+  ...skateparkCompletions, ...tokyoCompletions, ...bretagneCompletions,
 ]
-export const demoSpots: LocalSpot[] = [...lisboaSpots, ...corseSpots, ...doloSpots]
-export const demoExpenses: LocalExpense[] = [...lisboaExpenses, ...corseExpenses, ...doloExpenses]
-export const demoExpenseSplits: LocalExpenseSplit[] = [...lisboaSplits, ...corseSplits, ...doloSplits]
-export const demoChecklistItems: LocalChecklistItem[] = [...lisboaChecklist, ...corseChecklist, ...doloChecklist]
+export const demoSpots: LocalSpot[] = [
+  ...lisboaSpots, ...corseSpots, ...doloSpots,
+  ...skateparkSpots, ...tokyoSpots, ...bretagneSpots,
+]
+export const demoExpenses: LocalExpense[] = [
+  ...lisboaExpenses, ...corseExpenses, ...doloExpenses,
+  ...skateparkExpenses, ...tokyoExpenses, ...bretagneExpenses,
+]
+export const demoExpenseSplits: LocalExpenseSplit[] = [
+  ...lisboaSplits, ...corseSplits, ...doloSplits,
+  ...skateparkSplits, ...tokyoSplits, ...bretagneSplits,
+]
+export const demoChecklistItems: LocalChecklistItem[] = [
+  ...lisboaChecklist, ...corseChecklist, ...doloChecklist,
+  ...skateparkChecklist, ...tokyoChecklist, ...bretagneChecklist,
+]
 export const demoChecklistCompletions: LocalChecklistCompletion[] = [
-  ...lisboaChecklistDone,
-  ...corseChecklistDone,
-  ...doloChecklistDone,
+  ...lisboaChecklistDone, ...corseChecklistDone, ...doloChecklistDone,
+  ...skateparkChecklistDone, ...tokyoChecklistDone, ...bretagneChecklistDone,
 ]
-export const demoGuideCards: LocalGuideCard[] = [...lisboaGuide, ...corseGuide, ...doloGuide]
+export const demoGuideCards: LocalGuideCard[] = [
+  ...lisboaGuide, ...corseGuide, ...doloGuide,
+  ...skateparkGuide, ...tokyoGuide, ...bretagneGuide,
+]
 
 export const DEMO_TRIP_IDS = demoTrips.map((t) => t.id)
 export function isDemoTripId(id: string): boolean {
