@@ -3,8 +3,9 @@ import path from 'node:path'
 
 export default defineConfig({
   test: {
-    environment: 'node',
-    include: ['lib/**/*.test.ts'],
+    environment: 'jsdom',
+    include: ['lib/**/*.test.ts', 'lib/**/*.test.tsx', 'components/**/*.test.tsx'],
+    setupFiles: ['./vitest.setup.ts'],
   },
   resolve: {
     alias: { '@': path.resolve(__dirname, '.') },
