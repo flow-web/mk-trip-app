@@ -6,17 +6,20 @@ create or replace function public._compute_run_stats(
   distance_m     integer,
   speed_avg_kmh  numeric,
   speed_max_kmh  numeric
-) language plpgsql as $$
+) language plpgsql
+set search_path = public, extensions, pg_temp
+as $$
 declare
   v_dist_m float;
 begin
-  v_dist_m := ST_Length(p_trace::geography);
-  if p_duration_ms > 0 then
-    distance_m := round(v_dist_m)::integer;
-    speed_avg_kmh := round(((v_dist_m / (p_duration_ms / 1000.0)) * 3.6)::numeric, 2);
-    speed_max_kmh := round((speed_avg_kmh * 1.4)::numeric, 2);
-    return next;
+  if p_duration_ms <= 0 then
+    raise exception 'DURATION_ZERO';
   end if;
+  v_dist_m := ST_Length(p_trace::geography);
+  distance_m := round(v_dist_m)::integer;
+  speed_avg_kmh := round(((v_dist_m / (p_duration_ms / 1000.0)) * 3.6)::numeric, 2);
+  speed_max_kmh := round((speed_avg_kmh * 1.4)::numeric, 2);
+  return next;
 end;
 $$;
 
@@ -25,7 +28,9 @@ create or replace function public._validate_run(
   p_segment_id  uuid,
   p_trace       geometry,
   p_duration_ms integer
-) returns text language plpgsql as $$
+) returns text language plpgsql
+set search_path = public, extensions, pg_temp
+as $$
 declare
   v_seg              public.segments;
   v_rule             public.activity_rules;
@@ -82,7 +87,9 @@ create or replace function public.submit_run(
   p_trace       geometry,
   p_duration_ms integer,
   p_started_at  timestamptz
-) returns public.runs language plpgsql security definer as $$
+) returns public.runs language plpgsql security definer
+set search_path = public, extensions, pg_temp
+as $$
 declare
   v_reason text;
   v_stats record;
@@ -120,7 +127,9 @@ create or replace function public.create_segment_from_run(
   p_duration_ms integer,
   p_started_at  timestamptz,
   p_cover_color text default '#FF6B4A'
-) returns public.segments language plpgsql security definer as $$
+) returns public.segments language plpgsql security definer
+set search_path = public, extensions, pg_temp
+as $$
 declare
   v_seg public.segments;
   v_dist int;
