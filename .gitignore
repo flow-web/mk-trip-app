@@ -48,3 +48,4 @@ yarn-error.*
 out/
 .vercel
 next-env.d.ts
+.superpowers/
