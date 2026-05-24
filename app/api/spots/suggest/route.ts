@@ -34,6 +34,11 @@ export async function POST(req: Request): Promise<NextResponse> {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
   }
 
+  // Geocode destination once → used as fallback when a specific spot isn't found by Mapbox
+  const destCenter = await mapboxGeocode(parsed.destination)
+  const fallbackLat = destCenter?.lat ?? 0
+  const fallbackLng = destCenter?.lng ?? 0
+
   // Build prompt
   const prompt = buildPrompt({
     destination: parsed.destination,
@@ -65,8 +70,8 @@ export async function POST(req: Request): Promise<NextResponse> {
       return {
         id: crypto.randomUUID(),
         ...r,
-        lat: geo?.lat ?? 0,
-        lng: geo?.lng ?? 0,
+        lat: geo?.lat ?? fallbackLat,
+        lng: geo?.lng ?? fallbackLng,
         mapbox_verified: geo !== null,
       }
     }),

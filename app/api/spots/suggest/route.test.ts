@@ -51,6 +51,7 @@ describe('POST /api/spots/suggest', () => {
         address: `addr ${i}`,
       })),
     } as any)
+    // Called for destination center + each of the 8 spots
     mockMapboxGeocode.mockResolvedValue({ lat: 38.7, lng: -9.1, verified: true })
 
     const res = await POST(makeReq({
@@ -69,23 +70,46 @@ describe('POST /api/spots/suggest', () => {
     expect(body.suggestions[0].id).toMatch(/^[0-9a-f-]{36}$/i)
   })
 
-  it('flags suggestions as not verified when Mapbox returns null', async () => {
+  it('flags suggestions as not verified when Mapbox returns null for spot (uses destination fallback)', async () => {
     mockGenerateObject.mockResolvedValue({
       object: [{ name: 'X', category: 'food', description: 'd', address: 'a' }],
     } as any)
-    mockMapboxGeocode.mockResolvedValue(null)
+    // First call: destination geocode returns a center; second call: spot geocode returns null
+    mockMapboxGeocode
+      .mockResolvedValueOnce({ lat: 48.8, lng: 2.3, verified: true }) // destination center
+      .mockResolvedValueOnce(null) // spot not found
 
     const res = await POST(makeReq({
       tripId: VALID_TRIP_ID,
-      destination: 'X',
+      destination: 'Paris',
       tripType: 'city_break',
       excludeSpotIds: [],
     }))
 
     const body = await res.json()
     expect(body.suggestions[0].mapbox_verified).toBe(false)
-    expect(typeof body.suggestions[0].lat).toBe('number')
-    expect(typeof body.suggestions[0].lng).toBe('number')
+    // Falls back to destination center, NOT (0, 0)
+    expect(body.suggestions[0].lat).toBe(48.8)
+    expect(body.suggestions[0].lng).toBe(2.3)
+  })
+
+  it('falls back to (0, 0) only when both spot AND destination geocoding fail', async () => {
+    mockGenerateObject.mockResolvedValue({
+      object: [{ name: 'X', category: 'food', description: 'd', address: 'a' }],
+    } as any)
+    mockMapboxGeocode.mockResolvedValue(null) // both destination and spot return null
+
+    const res = await POST(makeReq({
+      tripId: VALID_TRIP_ID,
+      destination: 'UnknownPlace',
+      tripType: 'city_break',
+      excludeSpotIds: [],
+    }))
+
+    const body = await res.json()
+    expect(body.suggestions[0].mapbox_verified).toBe(false)
+    expect(body.suggestions[0].lat).toBe(0)
+    expect(body.suggestions[0].lng).toBe(0)
   })
 
   it('returns 429 when rate limit is exceeded', async () => {
