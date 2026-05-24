@@ -3,22 +3,13 @@
 import { useState } from 'react'
 import { Drawer } from 'vaul'
 import { Eyebrow } from '@/components/design/Eyebrow'
+import { CATEGORY_ICONS } from '@/lib/map/categoryIcons'
 import type { MapSpot } from '@/lib/map/spotFilters'
 
 interface Props {
   spots: MapSpot[]
   label: string // ex: "Tous les spots" ou "Jour 2"
   onSpotClick: (spotId: string) => void
-}
-
-const CATEGORY_ICONS: Record<string, string> = {
-  food: '🍴',
-  culture: '🏛',
-  nightlife: '🌙',
-  nature: '🌲',
-  accommodation: '🏠',
-  activity: '⚡',
-  sport: '🛹',
 }
 
 // Vaul snap points : 18% peek / 50% mid / 95% full
@@ -39,6 +30,7 @@ export function MapSpotSheet({ spots, label, onSpotClick }: Props) {
       <Drawer.Portal>
         <Drawer.Content className="fixed bottom-0 left-0 right-0 z-30 bg-white dark:bg-paper-dark-deep rounded-t-[16px] shadow-sheet outline-none">
           <div className="w-[38px] h-1 bg-hairline-strong rounded-full mx-auto mt-3 mb-3.5" />
+          <Drawer.Title className="sr-only">{label}</Drawer.Title>
           <div className="px-5 flex items-end justify-between">
             <div>
               <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">{label}</Eyebrow>

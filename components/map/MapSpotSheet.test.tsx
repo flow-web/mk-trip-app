@@ -17,7 +17,8 @@ describe('MapSpotSheet', () => {
         onSpotClick={() => {}}
       />,
     )
-    expect(screen.getByText(/tous les spots/i)).toBeInTheDocument()
+    // label appears in both Drawer.Title (sr-only) and the visible Eyebrow
+    expect(screen.getAllByText(/tous les spots/i).length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText(/2 spots/i)).toBeInTheDocument()
   })
 
