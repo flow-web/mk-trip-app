@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/db'
+import { mutations } from '@/lib/db/mutations'
 import { accentFor } from '@/lib/design/accent'
 import { useTripMapData } from '@/lib/map/useTripMapData'
 import { filterVisibleSpots, computeDayLines, type SelectedDayId } from '@/lib/map/spotFilters'
@@ -12,7 +13,7 @@ import { MapSpotSheet } from './MapSpotSheet'
 import { MapSpotDetailSheet } from './MapSpotDetailSheet'
 import { AISuggestionsPanel } from '@/components/ai/AISuggestionsPanel'
 import type { AISuggestion } from '@/lib/ai/suggestSpotsSchema'
-import type { LocalTrip, LocalSpot } from '@/lib/db/schema'
+import type { LocalTrip } from '@/lib/db/schema'
 
 const MapView = dynamic(
   () => import('./MapView').then((m) => m.MapView),
@@ -61,9 +62,9 @@ export function MapShell({ tripId }: Props) {
 
   const handleAcceptSuggestions = useCallback(async (selected: AISuggestion[]) => {
     if (!trip) return
-    const nowIso = new Date().toISOString()
     for (const s of selected) {
-      await db.spots.add({
+      // mutations.spot.create: Dexie optimistic write + enqueue for Supabase sync
+      await mutations.spot.create({
         id: crypto.randomUUID(),
         trip_id: trip.id,
         day_id: selectedDayId === 'all' ? null : selectedDayId,
@@ -76,9 +77,7 @@ export function MapShell({ tripId }: Props) {
         price: null,
         tags: [],
         image_url: null,
-        created_at: nowIso,
-        updated_at: nowIso,
-      } as LocalSpot)
+      })
     }
     setAiPanelOpen(false)
     // Don't set the dismiss flag here — user actively used the panel.

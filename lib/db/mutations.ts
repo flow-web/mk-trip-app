@@ -120,6 +120,10 @@ export const mutations = {
     },
     create: (item: InsertWithTempId<Tables['checklist_items']['Insert']>) => localInsert('checklist_items', item),
   },
+  spot: {
+    create: (data: InsertWithTempId<Tables['spots']['Insert']>) => localInsert('spots', data),
+    delete: (id: string) => localDelete('spots', id),
+  },
   message: {
     create: (data: InsertWithTempId<Tables['messages']['Insert']>) =>
       localInsert('messages', data),
