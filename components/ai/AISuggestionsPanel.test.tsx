@@ -30,7 +30,7 @@ describe('AISuggestionsPanel', () => {
     render(
       <AISuggestionsPanel
         tripId="t1" destination="Lisbonne" tripType="city_break"
-        excludeSpotIds={[]} dayId={null}
+        excludeSpotNames={[]} dayId={null}
         onClose={() => {}} onAccept={() => {}}
       />,
     )
@@ -44,7 +44,7 @@ describe('AISuggestionsPanel', () => {
     render(
       <AISuggestionsPanel
         tripId="t1" destination="X" tripType="city_break"
-        excludeSpotIds={[]} dayId={null}
+        excludeSpotNames={[]} dayId={null}
         onClose={() => {}} onAccept={() => {}}
       />,
     )
@@ -57,7 +57,7 @@ describe('AISuggestionsPanel', () => {
     render(
       <AISuggestionsPanel
         tripId="t1" destination="X" tripType="city_break"
-        excludeSpotIds={[]} dayId={null}
+        excludeSpotNames={[]} dayId={null}
         onClose={() => {}} onAccept={() => {}}
       />,
     )
@@ -71,7 +71,7 @@ describe('AISuggestionsPanel', () => {
     render(
       <AISuggestionsPanel
         tripId="t1" destination="X" tripType="city_break"
-        excludeSpotIds={[]} dayId={null}
+        excludeSpotNames={[]} dayId={null}
         onClose={() => {}} onAccept={() => {}}
       />,
     )
@@ -87,7 +87,7 @@ describe('AISuggestionsPanel', () => {
     render(
       <AISuggestionsPanel
         tripId="t1" destination="X" tripType="city_break"
-        excludeSpotIds={[]} dayId={null}
+        excludeSpotNames={[]} dayId={null}
         onClose={() => {}} onAccept={onAccept}
       />,
     )
@@ -105,7 +105,7 @@ describe('AISuggestionsPanel', () => {
     render(
       <AISuggestionsPanel
         tripId="t1" destination="X" tripType="city_break"
-        excludeSpotIds={[]} dayId={null}
+        excludeSpotNames={[]} dayId={null}
         onClose={onClose} onAccept={() => {}}
       />,
     )
@@ -121,7 +121,7 @@ describe('AISuggestionsPanel', () => {
     render(
       <AISuggestionsPanel
         tripId="t1" destination="X" tripType="city_break"
-        excludeSpotIds={[]} dayId={null}
+        excludeSpotNames={[]} dayId={null}
         onClose={() => {}} onAccept={() => {}}
       />,
     )

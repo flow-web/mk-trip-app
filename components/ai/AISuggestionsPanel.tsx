@@ -9,7 +9,7 @@ interface Props {
   tripId: string
   destination: string
   tripType: 'city_break' | 'road_trip' | 'sport' | 'hike' | 'beach' | 'other'
-  excludeSpotIds: string[]
+  excludeSpotNames: string[]
   dayId: string | null
   onClose: () => void
   onAccept: (selected: AISuggestion[]) => void
@@ -21,7 +21,7 @@ type FetchState =
   | { kind: 'results'; suggestions: AISuggestion[] }
 
 export function AISuggestionsPanel({
-  tripId, destination, tripType, excludeSpotIds, dayId, onClose, onAccept,
+  tripId, destination, tripType, excludeSpotNames, dayId, onClose, onAccept,
 }: Props) {
   const [state, setState] = useState<FetchState>({ kind: 'loading' })
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -37,7 +37,7 @@ export function AISuggestionsPanel({
         body: JSON.stringify({
           tripId, destination, tripType, dayId: dayId ?? undefined,
           promptHint: hint || undefined,
-          excludeSpotIds,
+          excludeNames: excludeSpotNames,
         }),
       })
       if (!res.ok) {
@@ -49,7 +49,7 @@ export function AISuggestionsPanel({
     } catch (err) {
       setState({ kind: 'error', message: String(err) })
     }
-  }, [tripId, destination, tripType, dayId, excludeSpotIds])
+  }, [tripId, destination, tripType, dayId, excludeSpotNames])
 
   useEffect(() => { doFetch() }, [doFetch])
 

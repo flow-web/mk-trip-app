@@ -12,7 +12,7 @@ const requestSchema = z.object({
   tripType: z.enum(['city_break', 'road_trip', 'sport', 'hike', 'beach', 'other']),
   dayId: z.string().uuid().optional(),
   promptHint: z.string().max(200).optional(),
-  excludeSpotIds: z.array(z.string()).optional().default(() => []),
+  excludeNames: z.array(z.string()).optional().default(() => []),
 })
 
 const COUNT_PER_BATCH = 8
@@ -49,7 +49,7 @@ export async function POST(req: Request): Promise<NextResponse> {
     destination: parsed.destination,
     tripType: parsed.tripType,
     count: COUNT_PER_BATCH,
-    excludeNames: parsed.excludeSpotIds,
+    excludeNames: parsed.excludeNames,
     dayContext: parsed.dayId ? `Jour ID ${parsed.dayId}` : undefined,
     promptHint: parsed.promptHint,
   })

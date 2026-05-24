@@ -144,7 +144,7 @@ export function MapShell({ tripId }: Props) {
           destination={trip.destination ?? trip.name}
           tripType={trip.trip_type}
           dayId={selectedDayId === 'all' ? null : selectedDayId}
-          excludeSpotIds={spots.map((s) => s.id)}
+          excludeSpotNames={spots.map((s) => s.name)}
           onClose={handleDismissAiPanel}
           onAccept={handleAcceptSuggestions}
         />

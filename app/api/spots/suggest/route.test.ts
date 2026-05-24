@@ -58,7 +58,7 @@ describe('POST /api/spots/suggest', () => {
       tripId: VALID_TRIP_ID,
       destination: 'Lisbonne',
       tripType: 'city_break',
-      excludeSpotIds: [],
+      excludeNames: [],
     }))
 
     expect(res.status).toBe(200)
@@ -83,7 +83,7 @@ describe('POST /api/spots/suggest', () => {
       tripId: VALID_TRIP_ID,
       destination: 'Paris',
       tripType: 'city_break',
-      excludeSpotIds: [],
+      excludeNames: [],
     }))
 
     const body = await res.json()
@@ -103,7 +103,7 @@ describe('POST /api/spots/suggest', () => {
       tripId: VALID_TRIP_ID,
       destination: 'UnknownPlace',
       tripType: 'city_break',
-      excludeSpotIds: [],
+      excludeNames: [],
     }))
 
     const body = await res.json()
@@ -118,7 +118,7 @@ describe('POST /api/spots/suggest', () => {
       tripId: VALID_TRIP_ID,
       destination: 'X',
       tripType: 'city_break',
-      excludeSpotIds: [],
+      excludeNames: [],
     }
     for (let i = 0; i < 10; i++) await POST(makeReq(body))
     const res = await POST(makeReq(body))
@@ -141,7 +141,7 @@ describe('POST /api/spots/suggest', () => {
       tripId: '00000000-0000-4000-8001-000000000064',
       destination: 'X',
       tripType: 'city_break',
-      excludeSpotIds: [],
+      excludeNames: [],
     }))
     expect(res.status).toBe(429)
     const body = await res.json()
@@ -154,7 +154,7 @@ describe('POST /api/spots/suggest', () => {
       tripId: VALID_TRIP_ID,
       destination: 'X',
       tripType: 'city_break',
-      excludeSpotIds: [],
+      excludeNames: [],
     }))
     expect(res.status).toBe(500)
   })
