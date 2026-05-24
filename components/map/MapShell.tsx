@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/db'
@@ -10,6 +10,9 @@ import { filterVisibleSpots, computeDayLines, type SelectedDayId } from '@/lib/m
 import { MapDayDock } from './MapDayDock'
 import { MapSpotSheet } from './MapSpotSheet'
 import { MapSpotDetailSheet } from './MapSpotDetailSheet'
+import { AISuggestionsPanel } from '@/components/ai/AISuggestionsPanel'
+import type { AISuggestion } from '@/lib/ai/suggestSpotsSchema'
+import type { LocalTrip, LocalSpot } from '@/lib/db/schema'
 
 const MapView = dynamic(
   () => import('./MapView').then((m) => m.MapView),
@@ -40,6 +43,46 @@ export function MapShell({ tripId }: Props) {
     () => (selectedSpotId ? db.spots.get(selectedSpotId) : undefined),
     [selectedSpotId],
   )
+
+  // Trigger 1 : panel auto-ouvert si voyage vide ET pas encore dismissé
+  const [aiPanelOpen, setAiPanelOpen] = useState(false)
+  useEffect(() => {
+    if (!trip) return
+    const dismissed = (trip as LocalTrip).ai_suggestions_dismissed === true
+    if (spots.length === 0 && !dismissed) setAiPanelOpen(true)
+  }, [trip, spots.length])
+
+  const handleDismissAiPanel = useCallback(async () => {
+    setAiPanelOpen(false)
+    if (trip) {
+      await db.trips.update(trip.id, { ai_suggestions_dismissed: true } as Partial<LocalTrip>)
+    }
+  }, [trip])
+
+  const handleAcceptSuggestions = useCallback(async (selected: AISuggestion[]) => {
+    if (!trip) return
+    const nowIso = new Date().toISOString()
+    for (const s of selected) {
+      await db.spots.add({
+        id: crypto.randomUUID(),
+        trip_id: trip.id,
+        day_id: selectedDayId === 'all' ? null : selectedDayId,
+        name: s.name,
+        description: s.description,
+        category: s.category,
+        lat: s.lat,
+        lng: s.lng,
+        zone: null,
+        price: null,
+        tags: [],
+        image_url: null,
+        created_at: nowIso,
+        updated_at: nowIso,
+      } as LocalSpot)
+    }
+    setAiPanelOpen(false)
+    // Don't set the dismiss flag here — user actively used the panel.
+  }, [trip, selectedDayId])
 
   if (!trip) return null
   const accent = accentFor(trip.trip_type)
@@ -93,6 +136,19 @@ export function MapShell({ tripId }: Props) {
         onClose={() => setSelectedSpotId(null)}
         accentColor={accent.base}
       />
+
+      {/* Panel suggestions IA (overlay) */}
+      {aiPanelOpen && trip && (
+        <AISuggestionsPanel
+          tripId={trip.id}
+          destination={trip.destination ?? trip.name}
+          tripType={trip.trip_type}
+          dayId={selectedDayId === 'all' ? null : selectedDayId}
+          excludeSpotIds={spots.map((s) => s.id)}
+          onClose={handleDismissAiPanel}
+          onAccept={handleAcceptSuggestions}
+        />
+      )}
     </div>
   )
 }
