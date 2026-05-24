@@ -51,7 +51,16 @@ export function MapSpotSheet({ spots, label, onSpotClick, onSuggestAI }: Props) 
           </div>
           {spots.length === 0 ? (
             <div className="px-5 mt-6 pb-8 text-sm text-ink-mute dark:text-ink-mute-dark">
-              Aucun spot pour ce filtre.
+              <div className="mb-3">Aucun spot pour ce filtre.</div>
+              {onSuggestAI && (
+                <button
+                  type="button"
+                  onClick={onSuggestAI}
+                  className="px-3 py-2 text-xs rounded-md bg-black text-white flex items-center gap-1.5"
+                >
+                  ✨ Suggérer pour ce jour
+                </button>
+              )}
             </div>
           ) : (
             <ul className="mt-3 px-5 pb-6 overflow-y-auto max-h-[calc(95vh-80px)] mk-noscroll">
