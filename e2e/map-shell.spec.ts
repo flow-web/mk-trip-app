@@ -56,8 +56,9 @@ test.describe('Map Shell v2', () => {
     await expect(j1).toContainText('J1')
     await j1.click({ force: true })
     await expect(j1).toHaveAttribute('aria-pressed', 'true')
-    // Label changes to "Jour 1" when day is selected (J1 has 3 spots)
-    await expect(page.getByText(/jour 1/i)).toBeVisible()
+    // Label changes to "Jour 1" when day is selected (J1 has 3 spots).
+    // Use first() because Drawer.Title (sr-only) and the visible Eyebrow both contain the text.
+    await expect(page.getByText(/jour 1/i).first()).toBeVisible()
     await expect(page.getByText(/3 spots/i)).toBeVisible()
   })
 
