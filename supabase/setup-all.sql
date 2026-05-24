@@ -173,6 +173,7 @@ create table public.activity_completions (
 create table public.spots (
   id uuid primary key default gen_random_uuid(),
   trip_id uuid not null references public.trips(id) on delete cascade,
+  day_id uuid references public.days(id) on delete set null,
   name text not null,
   description text,
   category spot_category not null default 'activity',
@@ -185,8 +186,11 @@ create table public.spots (
   updated_at timestamptz not null default now()
 );
 create index idx_spots_trip on public.spots(trip_id);
+create index idx_spots_day on public.spots(day_id);
 create trigger trg_spots_updated_at before update on public.spots
   for each row execute function public.set_updated_at();
+comment on column public.spots.day_id is
+  'Optional link to a specific day. When set, the spot appears in the day filter; when null, only visible in "Tous" view.';
 
 -- ─── expenses ─────────────────────────────────────────────────────────────────
 create table public.expenses (
