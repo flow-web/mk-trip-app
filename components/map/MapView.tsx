@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import { useMemo, useRef, useEffect } from 'react'
 import { Map, Marker, NavigationControl, Source, Layer, type MapRef } from 'react-map-gl'
 import { getDayColor } from '@/lib/map/dayColors'
+import { CATEGORY_ICONS } from '@/lib/map/categoryIcons'
 import type { MapSpot, DayLine, SelectedDayId } from '@/lib/map/spotFilters'
 
 interface Day {
@@ -18,16 +19,6 @@ interface Props {
   selectedSpotId: string | null
   selectedDayId: SelectedDayId
   onSpotClick: (spotId: string) => void
-}
-
-const CATEGORY_ICONS: Record<string, string> = {
-  food: '🍴',
-  culture: '🏛',
-  nightlife: '🌙',
-  nature: '🌲',
-  accommodation: '🏠',
-  activity: '⚡',
-  sport: '🛹',
 }
 
 export function MapView({
