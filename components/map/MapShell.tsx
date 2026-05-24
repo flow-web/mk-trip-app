@@ -20,6 +20,11 @@ const MapView = dynamic(
   { ssr: false },
 )
 
+// Feature flag: set NEXT_PUBLIC_AI_SUGGESTIONS_ENABLED=false to disable AI suggestions entirely.
+// Defaults to ON so production is not broken if the env var is absent.
+const AI_SUGGESTIONS_ENABLED =
+  process.env.NEXT_PUBLIC_AI_SUGGESTIONS_ENABLED !== 'false'
+
 interface Props {
   tripId: string
 }
@@ -45,9 +50,10 @@ export function MapShell({ tripId }: Props) {
     [selectedSpotId],
   )
 
-  // Trigger 1 : panel auto-ouvert si voyage vide ET pas encore dismissé
+  // Trigger 1 : panel auto-ouvert si voyage vide ET pas encore dismissé (gated by feature flag)
   const [aiPanelOpen, setAiPanelOpen] = useState(false)
   useEffect(() => {
+    if (!AI_SUGGESTIONS_ENABLED) return
     if (!trip) return
     const dismissed = (trip as LocalTrip).ai_suggestions_dismissed === true
     if (spots.length === 0 && !dismissed) setAiPanelOpen(true)
@@ -125,7 +131,7 @@ export function MapShell({ tripId }: Props) {
         spots={visibleSpots}
         label={dayLabel}
         onSpotClick={setSelectedSpotId}
-        onSuggestAI={() => setAiPanelOpen(true)}
+        onSuggestAI={AI_SUGGESTIONS_ENABLED ? () => setAiPanelOpen(true) : undefined}
       />
 
       {/* Sheet détail spot (overlay) */}
@@ -137,8 +143,8 @@ export function MapShell({ tripId }: Props) {
         accentColor={accent.base}
       />
 
-      {/* Panel suggestions IA (overlay) */}
-      {aiPanelOpen && trip && (
+      {/* Panel suggestions IA (overlay) — gated by AI_SUGGESTIONS_ENABLED */}
+      {AI_SUGGESTIONS_ENABLED && aiPanelOpen && trip && (
         <AISuggestionsPanel
           tripId={trip.id}
           destination={trip.destination ?? trip.name}
