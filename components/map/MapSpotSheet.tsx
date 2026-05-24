@@ -10,12 +10,13 @@ interface Props {
   spots: MapSpot[]
   label: string // ex: "Tous les spots" ou "Jour 2"
   onSpotClick: (spotId: string) => void
+  onSuggestAI?: () => void
 }
 
 // Vaul snap points : 18% peek / 50% mid / 95% full
 const SNAP_POINTS = ['180px', 0.5, 0.95] as const
 
-export function MapSpotSheet({ spots, label, onSpotClick }: Props) {
+export function MapSpotSheet({ spots, label, onSpotClick, onSuggestAI }: Props) {
   const [snap, setSnap] = useState<number | string | null>('180px')
 
   return (
@@ -38,6 +39,15 @@ export function MapSpotSheet({ spots, label, onSpotClick }: Props) {
                 {spots.length} spot{spots.length > 1 ? 's' : ''}
               </div>
             </div>
+            {onSuggestAI && (
+              <button
+                type="button"
+                onClick={onSuggestAI}
+                className="px-3 py-1.5 text-[11px] font-medium rounded-pill bg-black text-white flex items-center gap-1.5"
+              >
+                ✨ Suggérer
+              </button>
+            )}
           </div>
           {spots.length === 0 ? (
             <div className="px-5 mt-6 pb-8 text-sm text-ink-mute dark:text-ink-mute-dark">

@@ -126,6 +126,7 @@ export function MapShell({ tripId }: Props) {
         spots={visibleSpots}
         label={dayLabel}
         onSpotClick={setSelectedSpotId}
+        onSuggestAI={() => setAiPanelOpen(true)}
       />
 
       {/* Sheet détail spot (overlay) */}
