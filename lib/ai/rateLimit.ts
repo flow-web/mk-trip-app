@@ -28,6 +28,29 @@ export function checkRateLimit(key: string): boolean {
   return true
 }
 
+/**
+ * Global rate limit across all callers (all tripIds combined).
+ * Uses a fixed internal key so it's decoupled from per-trip buckets.
+ * Same caveat as checkRateLimit: best-effort, not distributed.
+ */
+export function checkGlobalRateLimit(maxRequestsPerMinute: number = 100): boolean {
+  const GLOBAL_KEY = '__global__'
+  const now = Date.now()
+  const bucket = buckets.get(GLOBAL_KEY)
+
+  if (!bucket || now >= bucket.resetAt) {
+    buckets.set(GLOBAL_KEY, { count: 1, resetAt: now + WINDOW_MS })
+    return true
+  }
+
+  if (bucket.count >= maxRequestsPerMinute) {
+    return false
+  }
+
+  bucket.count += 1
+  return true
+}
+
 // Test helper — not used in production code.
 export function _resetRateLimit(): void {
   buckets.clear()

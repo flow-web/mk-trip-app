@@ -125,6 +125,29 @@ describe('POST /api/spots/suggest', () => {
     expect(res.status).toBe(429)
   })
 
+  it('returns 429 with rate_limited_global when the global limit is exceeded', async () => {
+    mockGenerateObject.mockResolvedValue({ object: [] } as any)
+    mockMapboxGeocode.mockResolvedValue(null)
+    // Use 100 distinct tripIds so per-trip limit (10/min) never fires; only global cap (100) applies.
+    // Zod v4 requires variant nibble 8/9/a/b in position 19 of the UUID.
+    // Template: 00000000-0000-4000-8000-XXXXXXXXXXXX (variant=8, version=4)
+    for (let i = 0; i < 100; i++) {
+      const suffix = i.toString(16).padStart(12, '0')
+      const tripId = `00000000-0000-4000-8000-${suffix}`
+      await POST(makeReq({ tripId, destination: 'X', tripType: 'city_break', excludeSpotIds: [] }))
+    }
+    // 101st request hits the global cap
+    const res = await POST(makeReq({
+      tripId: '00000000-0000-4000-8001-000000000064',
+      destination: 'X',
+      tripType: 'city_break',
+      excludeSpotIds: [],
+    }))
+    expect(res.status).toBe(429)
+    const body = await res.json()
+    expect(body.error).toBe('rate_limited_global')
+  })
+
   it('returns 500 when the AI call throws', async () => {
     mockGenerateObject.mockRejectedValue(new Error('AI down'))
     const res = await POST(makeReq({

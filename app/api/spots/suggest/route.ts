@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { rawSuggestionsArraySchema, type RawSuggestion, type AISuggestion } from '@/lib/ai/suggestSpotsSchema'
 import { buildPrompt } from '@/lib/ai/suggestSpotsPrompt'
 import { mapboxGeocode } from '@/lib/ai/mapboxGeocode'
-import { checkRateLimit } from '@/lib/ai/rateLimit'
+import { checkRateLimit, checkGlobalRateLimit } from '@/lib/ai/rateLimit'
 
 const requestSchema = z.object({
   tripId: z.string().uuid(),
@@ -26,6 +26,11 @@ export async function POST(req: Request): Promise<NextResponse> {
     parsed = requestSchema.parse(json)
   } catch {
     return NextResponse.json({ error: 'invalid_body' }, { status: 400 })
+  }
+
+  // Global safety net: stop runaway burst across all callers
+  if (!checkGlobalRateLimit(100)) {
+    return NextResponse.json({ error: 'rate_limited_global' }, { status: 429 })
   }
 
   // Rate limit per tripId (proxy for user; full user identity would need auth)

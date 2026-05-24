@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { checkRateLimit, _resetRateLimit } from './rateLimit'
+import { checkRateLimit, checkGlobalRateLimit, _resetRateLimit } from './rateLimit'
 
 beforeEach(() => {
   _resetRateLimit()
@@ -36,5 +36,23 @@ describe('checkRateLimit', () => {
 
     vi.setSystemTime(new Date('2026-05-24T10:01:30Z')) // +90 seconds
     expect(checkRateLimit('key1')).toBe(true)
+  })
+})
+
+describe('checkGlobalRateLimit', () => {
+  it('allows up to N requests in the window', () => {
+    for (let i = 0; i < 100; i++) {
+      expect(checkGlobalRateLimit(100)).toBe(true)
+    }
+    expect(checkGlobalRateLimit(100)).toBe(false)
+  })
+
+  it('uses a separate bucket from per-key limits', () => {
+    // Exhaust per-key bucket for userA
+    for (let i = 0; i < 10; i++) checkRateLimit('userA')
+    expect(checkRateLimit('userA')).toBe(false) // 11th fails for userA
+
+    // Global bucket is independent: still has plenty of budget
+    expect(checkGlobalRateLimit(100)).toBe(true)
   })
 })
