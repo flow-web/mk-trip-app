@@ -29,6 +29,7 @@ export type LocalExpenseSplit = LocalRow<Tables['expense_splits']['Row']>
 export type LocalChecklistItem = LocalRow<Tables['checklist_items']['Row']>
 export type LocalChecklistCompletion = LocalRow<Tables['checklist_completions']['Row']>
 export type LocalGuideCard = LocalRow<Tables['guide_cards']['Row']>
+export type LocalMessage = LocalRow<Tables['messages']['Row']>
 
 // Sync queue entry
 export type SyncQueueOp = 'insert' | 'update' | 'delete'
