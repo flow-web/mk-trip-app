@@ -69,7 +69,8 @@ export function MapShell({ tripId }: Props) {
   const handleAcceptSuggestions = useCallback(async (selected: AISuggestion[]) => {
     if (!trip) return
     for (const s of selected) {
-      // mutations.spot.create: Dexie optimistic write + enqueue for Supabase sync
+      // mutations.spot.create: Dexie optimistic write + enqueue for Supabase sync.
+      // image_url is a local-only extension on LocalSpot (not in Supabase schema yet).
       await mutations.spot.create({
         id: crypto.randomUUID(),
         trip_id: trip.id,
@@ -82,7 +83,6 @@ export function MapShell({ tripId }: Props) {
         zone: null,
         price: null,
         tags: [],
-        image_url: null,
       })
     }
     setAiPanelOpen(false)
