@@ -33,7 +33,7 @@ export function useTripMapData(tripId: string): UseTripMapData {
       lat: Number(s.lat),
       lng: Number(s.lng),
       category: s.category,
-      day_id: (s as any).day_id ?? null,
+      day_id: s.day_id ?? null,
       time: null, // spots have no time of their own; line ordering falls back to insertion order via the sort fallback in computeDayLines
     }))
   return {
