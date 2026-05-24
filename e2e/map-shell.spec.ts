@@ -44,13 +44,9 @@ test.describe('Map Shell v2', () => {
     await expect(page.getByText(/\d+ spots?/)).toBeVisible({ timeout: 10_000 })
   })
 
-  // ⚠️ SKIPPED — fixture limitation: all demo spots for demo-trip-lisboa have day_id: null
-  // (see lib/demo/fixtures.ts, lisboaSpots array).
-  // Clicking J1 filters to 0 spots, making a meaningful assertion impossible.
-  // This scenario should be validated manually against a real trip with proper day_id
-  // linkages, or the fixtures should be updated to set day_id on at least one spot.
-  // See Task 14 acceptance manuelle for follow-up.
-  test.skip('Scenario 2: clicking a day pill filters spots', async ({ page }) => {
+  // Lisboa spots are linked to days (commit fca0851):
+  // s1, s2, s7 → d1 (J1, 3 spots); s3, s4 → d2; s5, s6 → d3; s8 → d4
+  test('Scenario 2: clicking a day pill filters spots', async ({ page }) => {
     await page.goto(DEMO_TRIP_MAP_URL)
     await page.waitForSelector('[data-testid="map-shell"]')
     const toolbar = page.locator('[role="toolbar"][aria-label="Filtre par jour"]')
@@ -60,8 +56,9 @@ test.describe('Map Shell v2', () => {
     await expect(j1).toContainText('J1')
     await j1.click({ force: true })
     await expect(j1).toHaveAttribute('aria-pressed', 'true')
-    // Label changes to "Jour 1" when day is selected
+    // Label changes to "Jour 1" when day is selected (J1 has 3 spots)
     await expect(page.getByText(/jour 1/i)).toBeVisible()
+    await expect(page.getByText(/3 spots/i)).toBeVisible()
   })
 
   test('Scenario 3: clicking a spot in the sheet opens the detail sheet', async ({ page }) => {
