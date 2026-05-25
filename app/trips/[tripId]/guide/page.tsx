@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Book, Flame, Sun, Wallet } from 'lucide-react'
@@ -13,6 +13,7 @@ import { Eyebrow } from '@/components/design/Eyebrow'
 import { InfoTiles } from '@/components/guide/InfoTiles'
 import { ChecklistGroup } from '@/components/guide/ChecklistGroup'
 import { ChecklistSuggestPanel } from '@/components/guide/ChecklistSuggestPanel'
+import { WeatherWidget } from '@/components/guide/WeatherWidget'
 import { CrewNote } from '@/components/guide/CrewNote'
 import { usePageTour } from '@/hooks/usePageTour'
 import type { ChecklistSuggestion } from '@/lib/ai/suggestChecklistSchema'
@@ -35,9 +36,26 @@ function getDurationDays(start: string | null, end: string | null): number {
 export default function GuidePage() {
   const { tripId } = useParams<{ tripId: string }>()
   const [suggestOpen, setSuggestOpen] = useState(false)
+  const [weatherLabel, setWeatherLabel] = useState('—')
   usePageTour('guide')
 
   const trip = useLiveQuery(() => db.trips.get(tripId), [tripId])
+  const spots = useLiveQuery(
+    () => db.spots.where({ trip_id: tripId }).toArray(), [tripId],
+  ) ?? []
+  const firstSpotWithCoords = spots.find((s) => s.lat != null && s.lng != null)
+
+  useEffect(() => {
+    if (!firstSpotWithCoords) return
+    fetch(`https://api.open-meteo.com/v1/forecast?latitude=${firstSpotWithCoords.lat}&longitude=${firstSpotWithCoords.lng}&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.daily) {
+          setWeatherLabel(`${Math.round(data.daily.temperature_2m_min[0])}–${Math.round(data.daily.temperature_2m_max[0])}°`)
+        }
+      })
+      .catch(() => {})
+  }, [firstSpotWithCoords?.lat, firstSpotWithCoords?.lng])
   const items =
     useLiveQuery(
       () => db.checklist_items.where({ trip_id: tripId }).sortBy('position'),
@@ -110,7 +128,7 @@ export default function GuidePage() {
                 emphasis: true,
                 accentColor: accent.base,
               },
-              { Icon: Sun, title: 'Météo type', value: '22-26°' },
+              { Icon: Sun, title: 'Météo', value: weatherLabel },
             ]}
           />
         </div>
