@@ -790,6 +790,110 @@ export type Database = {
           },
         ]
       }
+      strava_activities: {
+        Row: {
+          average_speed: number | null
+          created_at: string
+          distance: number
+          elapsed_time: number
+          end_latlng: number[] | null
+          id: number
+          max_speed: number | null
+          moving_time: number
+          name: string
+          polyline: string | null
+          sport_type: string
+          start_date: string
+          start_latlng: number[] | null
+          streams_json: Json | null
+          total_elevation: number | null
+          trace: unknown
+          trip_id: string | null
+          user_id: string
+        }
+        Insert: {
+          average_speed?: number | null
+          created_at?: string
+          distance: number
+          elapsed_time: number
+          end_latlng?: number[] | null
+          id: number
+          max_speed?: number | null
+          moving_time: number
+          name: string
+          polyline?: string | null
+          sport_type: string
+          start_date: string
+          start_latlng?: number[] | null
+          streams_json?: Json | null
+          total_elevation?: number | null
+          trace?: unknown
+          trip_id?: string | null
+          user_id: string
+        }
+        Update: {
+          average_speed?: number | null
+          created_at?: string
+          distance?: number
+          elapsed_time?: number
+          end_latlng?: number[] | null
+          id?: number
+          max_speed?: number | null
+          moving_time?: number
+          name?: string
+          polyline?: string | null
+          sport_type?: string
+          start_date?: string
+          start_latlng?: number[] | null
+          streams_json?: Json | null
+          total_elevation?: number | null
+          trace?: unknown
+          trip_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "strava_activities_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      strava_tokens: {
+        Row: {
+          access_token: string
+          athlete_id: number
+          created_at: string
+          expires_at: number
+          refresh_token: string
+          scope: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          athlete_id: number
+          created_at?: string
+          expires_at: number
+          refresh_token: string
+          scope: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          athlete_id?: number
+          created_at?: string
+          expires_at?: number
+          refresh_token?: string
+          scope?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       trip_members: {
         Row: {
           joined_at: string
@@ -1916,6 +2020,10 @@ export type Database = {
       st_wrapx: {
         Args: { geom: unknown; move: number; wrap: number }
         Returns: unknown
+      }
+      strava_auto_link_trip: {
+        Args: { p_start_date: string; p_user_id: string }
+        Returns: string
       }
       submit_run: {
         Args: {

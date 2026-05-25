@@ -9,6 +9,7 @@ import { TripSwitcher } from '@/components/design/TripSwitcher'
 import { UpcomingCarousel } from '@/components/home/UpcomingCarousel'
 import { CrewStats } from '@/components/home/CrewStats'
 import { QuickActions } from '@/components/home/QuickActions'
+import { StravaConnectButton } from '@/components/strava/StravaConnectButton'
 import type { Database } from '@/lib/supabase/types'
 
 type Trip = Database['public']['Tables']['trips']['Row']
@@ -141,6 +142,9 @@ export function HomeClient({
             remainingCount={remainingCount}
           />
           <CrewStats stats={stats} />
+          <div className="px-5 py-3">
+            <StravaConnectButton />
+          </div>
           <div className="md:hidden">
             <QuickActions tripId={tripId} />
           </div>

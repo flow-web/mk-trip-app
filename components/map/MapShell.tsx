@@ -17,6 +17,7 @@ import { MapSpotSheet } from './MapSpotSheet'
 import { MapSpotDetailSheet } from './MapSpotDetailSheet'
 import { AISuggestionsPanel } from '@/components/ai/AISuggestionsPanel'
 import type { AISuggestion } from '@/lib/ai/suggestSpotsSchema'
+import { useStravaActivities } from '@/lib/strava/useStravaActivities'
 import type { LocalTrip, LocalDay } from '@/lib/db/schema'
 
 const MapView = dynamic(
@@ -36,6 +37,7 @@ interface Props {
 export function MapShell({ tripId }: Props) {
   const trip = useLiveQuery(() => db.trips.get(tripId), [tripId])
   const { days, spots } = useTripMapData(tripId)
+  const { activities: stravaActivities } = useStravaActivities(tripId)
   const [selectedDayId, setSelectedDayId] = useState<SelectedDayId>('all')
   const [selectedSpotId, setSelectedSpotId] = useState<string | null>(null)
 
@@ -168,6 +170,7 @@ export function MapShell({ tripId }: Props) {
           lines={lines}
           selectedSpotId={selectedSpotId}
           selectedDayId={selectedDayId}
+          stravaActivities={stravaActivities}
           onSpotClick={setSelectedSpotId}
         />
       </div>

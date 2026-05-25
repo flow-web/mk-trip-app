@@ -5,7 +5,9 @@ import { useMemo, useRef, useEffect } from 'react'
 import { Map, Marker, NavigationControl, Source, Layer, type MapRef } from 'react-map-gl'
 import { getDayColor } from '@/lib/map/dayColors'
 import { CATEGORY_ICONS } from '@/lib/map/categoryIcons'
+import { decodePolyline, sportColor } from '@/lib/strava/polyline'
 import type { MapSpot, DayLine, SelectedDayId } from '@/lib/map/spotFilters'
+import type { StravaActivityRow } from '@/lib/strava/queries'
 
 interface Day {
   id: string
@@ -16,6 +18,7 @@ interface Props {
   spots: MapSpot[]
   days: Day[]
   lines: DayLine[]
+  stravaActivities?: StravaActivityRow[]
   selectedSpotId: string | null
   selectedDayId: SelectedDayId
   onSpotClick: (spotId: string) => void
@@ -25,6 +28,7 @@ export function MapView({
   spots,
   days,
   lines,
+  stravaActivities = [],
   selectedSpotId,
   selectedDayId,
   onSpotClick,
@@ -67,6 +71,27 @@ export function MapView({
     [lines, dayIndex],
   )
 
+  const stravaGeoJSON = useMemo(
+    () => ({
+      type: 'FeatureCollection' as const,
+      features: stravaActivities
+        .filter((a) => a.polyline)
+        .map((a) => ({
+          type: 'Feature' as const,
+          properties: {
+            color: sportColor(a.sport_type),
+            name: a.name,
+            sport: a.sport_type,
+          },
+          geometry: {
+            type: 'LineString' as const,
+            coordinates: decodePolyline(a.polyline!),
+          },
+        })),
+    }),
+    [stravaActivities],
+  )
+
   const center = spots[0] ?? { lat: 38.722, lng: -9.139 }
 
   return (
@@ -92,6 +117,21 @@ export function MapView({
               'line-color': ['get', 'color'],
               'line-width': 3,
               'line-opacity': 0.6,
+            }}
+            layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+          />
+        </Source>
+      )}
+
+      {stravaGeoJSON.features.length > 0 && (
+        <Source id="strava-activities" type="geojson" data={stravaGeoJSON}>
+          <Layer
+            id="strava-activities-layer"
+            type="line"
+            paint={{
+              'line-color': ['get', 'color'],
+              'line-width': 4,
+              'line-opacity': 0.8,
             }}
             layout={{ 'line-cap': 'round', 'line-join': 'round' }}
           />
