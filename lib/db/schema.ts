@@ -26,8 +26,9 @@ export type LocalDay = LocalRow<Tables['days']['Row']> & {
 export type LocalActivity = LocalRow<Tables['activities']['Row']>
 export type LocalActivityCompletion = LocalRow<Tables['activity_completions']['Row']>
 // LocalSpot : étendu avec `image_url` (photo du spot). Même statut que note ci-dessus.
-export type LocalSpot = LocalRow<Tables['spots']['Row']> & {
+export type LocalSpot = LocalRow<Omit<Tables['spots']['Row'], 'estimated_cost'>> & {
   image_url?: string | null
+  estimated_cost?: number
 }
 export type LocalExpense = LocalRow<Tables['expenses']['Row']>
 export type LocalExpenseSplit = LocalRow<Tables['expense_splits']['Row']>

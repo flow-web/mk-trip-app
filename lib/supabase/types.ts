@@ -409,6 +409,123 @@ export type Database = {
           },
         ]
       }
+      poll_options: {
+        Row: {
+          id: string
+          label: string
+          poll_id: string
+          position: number
+        }
+        Insert: {
+          id?: string
+          label: string
+          poll_id: string
+          position?: number
+        }
+        Update: {
+          id?: string
+          label?: string
+          poll_id?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_options_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      poll_votes: {
+        Row: {
+          option_id: string
+          poll_id: string
+          user_id: string
+          voted_at: string
+        }
+        Insert: {
+          option_id: string
+          poll_id: string
+          user_id: string
+          voted_at?: string
+        }
+        Update: {
+          option_id?: string
+          poll_id?: string
+          user_id?: string
+          voted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_votes_option_id_fkey"
+            columns: ["option_id"]
+            isOneToOne: false
+            referencedRelation: "poll_options"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "poll_votes_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "polls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "poll_votes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      polls: {
+        Row: {
+          closed: boolean
+          created_at: string
+          created_by: string
+          id: string
+          question: string
+          trip_id: string
+          updated_at: string
+        }
+        Insert: {
+          closed?: boolean
+          created_at?: string
+          created_by: string
+          id?: string
+          question: string
+          trip_id: string
+          updated_at?: string
+        }
+        Update: {
+          closed?: boolean
+          created_at?: string
+          created_by?: string
+          id?: string
+          question?: string
+          trip_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "polls_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "polls_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -574,12 +691,46 @@ export type Database = {
         }
         Relationships: []
       }
+      spot_checkins: {
+        Row: {
+          checked_in_at: string
+          spot_id: string
+          user_id: string
+        }
+        Insert: {
+          checked_in_at?: string
+          spot_id: string
+          user_id: string
+        }
+        Update: {
+          checked_in_at?: string
+          spot_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spot_checkins_spot_id_fkey"
+            columns: ["spot_id"]
+            isOneToOne: false
+            referencedRelation: "spots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spot_checkins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       spots: {
         Row: {
           category: Database["public"]["Enums"]["spot_category"]
           created_at: string
           day_id: string | null
           description: string | null
+          estimated_cost: number
           id: string
           lat: number | null
           lng: number | null
@@ -595,6 +746,7 @@ export type Database = {
           created_at?: string
           day_id?: string | null
           description?: string | null
+          estimated_cost?: number
           id?: string
           lat?: number | null
           lng?: number | null
@@ -610,6 +762,7 @@ export type Database = {
           created_at?: string
           day_id?: string | null
           description?: string | null
+          estimated_cost?: number
           id?: string
           lat?: number | null
           lng?: number | null
@@ -2003,4 +2156,3 @@ export const Constants = {
     },
   },
 } as const
-
