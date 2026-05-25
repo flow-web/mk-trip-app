@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server'
 import { generateObject } from 'ai'
+import { gateway } from '@ai-sdk/gateway'
 import { z } from 'zod'
 import { rawSuggestionsArraySchema, type RawSuggestion, type AISuggestion } from '@/lib/ai/suggestSpotsSchema'
 import { buildPrompt } from '@/lib/ai/suggestSpotsPrompt'
 import { mapboxGeocode } from '@/lib/ai/mapboxGeocode'
 import { checkRateLimit, checkGlobalRateLimit } from '@/lib/ai/rateLimit'
+import { createClient } from '@/lib/supabase/server'
 
 const requestSchema = z.object({
   tripId: z.string().uuid(),
@@ -19,6 +21,13 @@ const COUNT_PER_BATCH = 8
 const MODEL_ID = 'anthropic/claude-haiku-4-5'
 
 export async function POST(req: Request): Promise<NextResponse> {
+  // Auth: require authenticated user
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  }
+
   // Parse + validate body
   let parsed: z.infer<typeof requestSchema>
   try {
@@ -33,8 +42,8 @@ export async function POST(req: Request): Promise<NextResponse> {
     return NextResponse.json({ error: 'rate_limited_global' }, { status: 429 })
   }
 
-  // Rate limit per tripId (proxy for user; full user identity would need auth)
-  const rlKey = `trip:${parsed.tripId}`
+  // Rate limit per user
+  const rlKey = `user:${user.id}`
   if (!checkRateLimit(rlKey)) {
     return NextResponse.json({ error: 'rate_limited' }, { status: 429 })
   }
@@ -58,7 +67,7 @@ export async function POST(req: Request): Promise<NextResponse> {
   let raw: RawSuggestion[]
   try {
     const result = await generateObject({
-      model: MODEL_ID,
+      model: gateway(MODEL_ID),
       schema: rawSuggestionsArraySchema,
       prompt,
     })

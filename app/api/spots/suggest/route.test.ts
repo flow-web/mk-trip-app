@@ -8,6 +8,17 @@ vi.mock('ai', () => ({
 vi.mock('@/lib/ai/mapboxGeocode', () => ({
   mapboxGeocode: vi.fn(),
 }))
+// Mock @ai-sdk/gateway
+vi.mock('@ai-sdk/gateway', () => ({
+  gateway: vi.fn((id: string) => id),
+}))
+// Mock Supabase server client — authenticated by default
+const mockGetUser = vi.fn()
+vi.mock('@/lib/supabase/server', () => ({
+  createClient: vi.fn(() => Promise.resolve({
+    auth: { getUser: mockGetUser },
+  })),
+}))
 
 import { POST } from './route'
 import { generateObject } from 'ai'
@@ -29,14 +40,25 @@ function makeReq(body: object): Request {
   })
 }
 
+const MOCK_USER_ID = '11111111-1111-4111-8111-111111111111'
+
 beforeEach(() => {
   vi.clearAllMocks()
   _resetRateLimit()
   process.env.NEXT_PUBLIC_MAPBOX_TOKEN = 'fake'
   process.env.AI_GATEWAY_API_KEY = 'fake-gw-key'
+  mockGetUser.mockResolvedValue({ data: { user: { id: MOCK_USER_ID } } })
 })
 
 describe('POST /api/spots/suggest', () => {
+  it('returns 401 if user is not authenticated', async () => {
+    mockGetUser.mockResolvedValueOnce({ data: { user: null } })
+    const res = await POST(makeReq({ tripId: VALID_TRIP_ID, destination: 'X', tripType: 'city_break' }))
+    expect(res.status).toBe(401)
+    const body = await res.json()
+    expect(body.error).toBe('unauthorized')
+  })
+
   it('returns 400 if body is invalid', async () => {
     const res = await POST(makeReq({ tripId: 'x' })) // missing required fields + invalid uuid
     expect(res.status).toBe(400)
@@ -128,17 +150,16 @@ describe('POST /api/spots/suggest', () => {
   it('returns 429 with rate_limited_global when the global limit is exceeded', async () => {
     mockGenerateObject.mockResolvedValue({ object: [] } as any)
     mockMapboxGeocode.mockResolvedValue(null)
-    // Use 100 distinct tripIds so per-trip limit (10/min) never fires; only global cap (100) applies.
-    // Zod v4 requires variant nibble 8/9/a/b in position 19 of the UUID.
-    // Template: 00000000-0000-4000-8000-XXXXXXXXXXXX (variant=8, version=4)
+    // Use 100 distinct user IDs so per-user limit (10/min) never fires; only global cap (100) applies.
     for (let i = 0; i < 100; i++) {
       const suffix = i.toString(16).padStart(12, '0')
-      const tripId = `00000000-0000-4000-8000-${suffix}`
-      await POST(makeReq({ tripId, destination: 'X', tripType: 'city_break', excludeSpotIds: [] }))
+      const userId = `00000000-0000-4000-8000-${suffix}`
+      mockGetUser.mockResolvedValueOnce({ data: { user: { id: userId } } })
+      await POST(makeReq({ tripId: VALID_TRIP_ID, destination: 'X', tripType: 'city_break', excludeNames: [] }))
     }
     // 101st request hits the global cap
     const res = await POST(makeReq({
-      tripId: '00000000-0000-4000-8001-000000000064',
+      tripId: VALID_TRIP_ID,
       destination: 'X',
       tripType: 'city_break',
       excludeNames: [],
