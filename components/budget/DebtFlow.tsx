@@ -53,9 +53,12 @@ export function DebtFlow({ lines, onSettle }: Props) {
               {confirming === i ? (
                 <button
                   type="button"
-                  onClick={() => {
-                    onSettle(d.fromId, d.toId, d.amountCents)
-                    setConfirming(null)
+                  onClick={async () => {
+                    try {
+                      await onSettle(d.fromId, d.toId, d.amountCents)
+                    } finally {
+                      setConfirming(null)
+                    }
                   }}
                   className="ml-1 px-2 py-1 text-[10px] mk-mono rounded bg-green-600 text-white"
                 >

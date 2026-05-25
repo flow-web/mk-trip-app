@@ -19,9 +19,9 @@ import type { ChecklistSuggestion } from '@/lib/ai/suggestChecklistSchema'
 function getSeason(startDate: string | null): string {
   if (!startDate) return 'summer'
   const month = new Date(startDate).getMonth()
-  if (month >= 2 && month <= 4) return 'spring'
-  if (month >= 5 && month <= 7) return 'summer'
-  if (month >= 8 && month <= 10) return 'autumn'
+  if (month >= 2 && month < 5) return 'spring'
+  if (month >= 5 && month < 8) return 'summer'
+  if (month >= 8 && month < 11) return 'autumn'
   return 'winter'
 }
 

@@ -168,9 +168,12 @@ export function ExpenseDialog({
   async function onDelete() {
     if (!expense) return
     setDeleting(true)
-    await mutations.expense.delete(expense.id)
-    setOpen(false)
-    setDeleting(false)
+    try {
+      await mutations.expense.delete(expense.id)
+      setOpen(false)
+    } catch {
+      setDeleting(false)
+    }
   }
 
   function toggleMember(userId: string) {

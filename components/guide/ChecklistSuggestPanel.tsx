@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import type { ChecklistSuggestion } from '@/lib/ai/suggestChecklistSchema'
 
@@ -37,7 +37,9 @@ export function ChecklistSuggestPanel({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
-  useState(() => {
+  useEffect(() => {
+    setLoading(true)
+    setError(false)
     fetch('/api/checklist/suggest', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -58,7 +60,8 @@ export function ChecklistSuggestPanel({
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function toggleItem(index: number) {
     setSelected((prev) => {

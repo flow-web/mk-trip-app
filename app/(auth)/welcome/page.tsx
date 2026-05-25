@@ -50,6 +50,7 @@ export default function WelcomePage() {
       router.push('/demo' as any)
     } catch (e) {
       setErr((e as Error).message)
+    } finally {
       setDemoLoading(false)
     }
   }
