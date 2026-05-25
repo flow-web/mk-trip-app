@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/db'
 import { mutations } from '@/lib/db/mutations'
+import { supabase } from '@/lib/supabase/client'
 import { accentFor } from '@/lib/design/accent'
 import { useTripMapData } from '@/lib/map/useTripMapData'
 import { filterVisibleSpots, computeDayLines, type SelectedDayId } from '@/lib/map/spotFilters'
@@ -86,6 +87,13 @@ export function MapShell({ tripId }: Props) {
     () => (selectedSpotId ? db.spots.get(selectedSpotId) : undefined),
     [selectedSpotId],
   )
+
+  const checkins = useLiveQuery(
+    () => db.spot_checkins.where({ spot_id: selectedSpotId ?? '' }).toArray(),
+    [selectedSpotId],
+  ) ?? []
+
+  const isCheckedIn = checkins.some((c) => c.user_id === trip?.owner_id)
 
   // Trigger 1 : panel auto-ouvert si voyage vide ET pas encore dismissé (gated by feature flag)
   const [aiPanelOpen, setAiPanelOpen] = useState(false)
@@ -215,6 +223,19 @@ export function MapShell({ tripId }: Props) {
           : null}
         onClose={() => setSelectedSpotId(null)}
         accentColor={accent.base}
+        checkedIn={isCheckedIn}
+        onToggleCheckin={selectedSpotId ? async () => {
+          const { data: { user } } = await supabase.auth.getUser()
+          if (!user || !selectedSpotId) return
+          if (isCheckedIn) {
+            await mutations.spot.uncheckIn(selectedSpotId, user.id)
+          } else {
+            await mutations.spot.checkin(selectedSpotId, user.id)
+          }
+        } : undefined}
+        onUpdateEstimatedCost={selectedSpotId ? async (cents: number) => {
+          await mutations.spot.update(selectedSpotId, { estimated_cost: cents } as any)
+        } : undefined}
       />
 
       {/* Panel suggestions IA (overlay) — gated by AI_SUGGESTIONS_ENABLED */}

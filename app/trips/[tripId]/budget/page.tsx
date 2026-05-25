@@ -52,10 +52,18 @@ export default function BudgetPage() {
       [tripId],
     ) ?? []
   const profiles = useLiveQuery(() => db.profiles.toArray(), []) ?? []
+  const spots = useLiveQuery(
+    () => db.spots.where({ trip_id: tripId }).toArray(),
+    [tripId],
+  ) ?? []
 
   if (!trip) return null
   const accent = accentFor(trip.trip_type)
   const totalCents = expenses.reduce((s, e) => s + (e.amount ?? 0), 0)
+  const estimatedCents = spots.reduce(
+    (s, sp) => s + ((sp as any).estimated_cost ?? 0),
+    0,
+  )
   const budget = trip.total_budget ? trip.total_budget * 100 : 0
   const pct = budget ? Math.round((totalCents / budget) * 100) : 0
 
@@ -172,6 +180,27 @@ export default function BudgetPage() {
                 background: accent.base,
               }}
             />
+          </div>
+        )}
+
+        {(estimatedCents > 0 || budget > 0) && (
+          <div className="mt-5 bg-white dark:bg-paper-dark-deep rounded-md border border-hairline dark:border-hairline-dark p-4">
+            <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark mb-2">PRÉVISIONNEL</div>
+            <div className="flex items-baseline justify-between">
+              <div className="text-sm">
+                <span className="font-medium">Estimé :</span>{' '}
+                <span className="mk-mono">{(estimatedCents / 100).toFixed(2)} €</span>
+              </div>
+              <div className="text-sm">
+                <span className="font-medium">Dépensé :</span>{' '}
+                <span className="mk-mono">{(totalCents / 100).toFixed(2)} €</span>
+              </div>
+            </div>
+            {budget > 0 && estimatedCents > budget && (
+              <div className="mt-2 text-xs text-red-600 mk-mono">
+                ⚠ L'estimation dépasse le budget de {((estimatedCents - budget) / 100).toFixed(2)} €
+              </div>
+            )}
           </div>
         )}
 
