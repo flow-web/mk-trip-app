@@ -15,10 +15,13 @@ import { SortableTimeline } from '@/components/planning/SortableTimeline'
 import { ImportTicketDialog } from '@/components/planning/ImportTicketDialog'
 import { usePageTour } from '@/hooks/usePageTour'
 import type { TicketExtract } from '@/lib/ai/ticketExtractSchema'
+import type { DayRecap } from '@/lib/ai/dayRecapSchema'
 
 export default function PlanningPage() {
   const { tripId } = useParams<{ tripId: string }>()
   const [importOpen, setImportOpen] = useState(false)
+  const [recap, setRecap] = useState<DayRecap | null>(null)
+  const [recapLoading, setRecapLoading] = useState(false)
   usePageTour('planning')
   const trip = useLiveQuery(() => db.trips.get(tripId), [tripId])
   const days =
@@ -65,6 +68,43 @@ export default function PlanningPage() {
       .sortBy('position')
     const newPosition = targetActivities.length
     await mutations.activity.moveToDay(activityId, newDayId, newPosition)
+  }
+
+  async function handleRecap() {
+    if (recapLoading || !trip || !day) return
+    setRecapLoading(true)
+    setRecap(null)
+    try {
+      const dayExpenses = await db.expenses.where({ trip_id: tripId }).toArray()
+      const daySpots = await db.spots.where({ trip_id: tripId }).toArray()
+      const dayCheckins = await db.spot_checkins.toArray()
+      const checkedSpotIds = new Set(dayCheckins.map((c) => c.spot_id))
+
+      const res = await fetch('/api/days/recap', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          destination: trip.destination ?? trip.name,
+          dayNumber: day.day_number,
+          date: day.date,
+          activities: activities.map((a) => ({
+            title: a.title,
+            subtitle: a.subtitle,
+            time: a.time,
+            done: !!completions.get(a.id),
+          })),
+          expenses: dayExpenses
+            .filter((e) => (e.category as string) !== 'settlement')
+            .slice(0, 10)
+            .map((e) => ({ note: e.note, category: e.category, amount: e.amount })),
+          spotsVisited: daySpots
+            .filter((s) => checkedSpotIds.has(s.id))
+            .map((s) => s.name),
+        }),
+      })
+      if (res.ok) setRecap(await res.json())
+    } catch {}
+    setRecapLoading(false)
   }
 
   async function handleImportTicket(ticket: TicketExtract) {
@@ -142,6 +182,31 @@ export default function PlanningPage() {
             </p>
           </div>
         )}
+
+        {recap && (
+          <div className="mt-4 p-4 rounded-xs bg-paper-deep dark:bg-paper-dark-deep border-l-2" style={{ borderColor: accent.base }}>
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="mk-mono text-[10px]" style={{ color: accent.base }}>RÉCAP IA</div>
+              <div className="mk-mono text-[10px] text-ink-mute">
+                {recap.mood === 'amazing' ? '🔥' : recap.mood === 'great' ? '😎' : recap.mood === 'good' ? '👍' : recap.mood === 'meh' ? '😐' : '💪'}
+              </div>
+            </div>
+            <p className="text-sm leading-relaxed text-ink-soft dark:text-ink-soft-dark">{recap.recap}</p>
+            <div className="mt-1.5 mk-mono text-[10px] text-ink-mute">Highlight : {recap.highlight}</div>
+          </div>
+        )}
+
+        {!recap && (
+          <button
+            type="button"
+            onClick={handleRecap}
+            disabled={recapLoading}
+            className="mt-3 text-[11px] mk-mono text-ink-mute hover:text-ink underline transition disabled:opacity-50"
+          >
+            {recapLoading ? 'Génération...' : '📝 Récap IA du jour'}
+          </button>
+        )}
+
         <div data-tour="planning-weekstrip">
         <WeekStrip
           days={days.map((d) => ({
