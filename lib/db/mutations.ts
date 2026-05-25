@@ -76,6 +76,30 @@ export const mutations = {
       return { id }
     },
     delete: (id: string) => localDelete('expenses', id),
+    update: async (
+      id: string,
+      patch: Partial<Tables['expenses']['Update']>,
+      newSplits?: Array<Omit<Tables['expense_splits']['Insert'], 'expense_id'>>,
+    ) => {
+      await localUpdate('expenses', id, patch)
+      if (newSplits) {
+        const oldSplits = await db.expense_splits.where({ expense_id: id }).toArray()
+        for (const old of oldSplits) {
+          await db.expense_splits.delete([old.expense_id, old.user_id] as any)
+          await enqueue({
+            op: 'delete',
+            table: 'expense_splits',
+            payload: { expense_id: old.expense_id, user_id: old.user_id },
+            row_id: old.expense_id,
+            composite_keys: { expense_id: old.expense_id, user_id: old.user_id },
+          })
+        }
+        for (const split of newSplits) {
+          await localInsert('expense_splits', { ...split, expense_id: id })
+        }
+        flush()
+      }
+    },
   },
   activity: {
     toggleCompletion: async (activityId: string, userId: string, done: boolean) => {
