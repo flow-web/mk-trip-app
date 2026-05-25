@@ -1,21 +1,36 @@
-import { CalendarPlus, MapPin, Plus, Receipt } from 'lucide-react'
+import { CalendarPlus, MapPin, Plus, Receipt, Timer, BarChart3, Car, Vote } from 'lucide-react'
 
 export function QuickActions({ tripId }: { tripId: string }) {
   const items = [
     {
       Icon: Receipt,
       label: 'Dépense',
-      href: `/trips/${tripId}/budget?new=1`,
+      href: `/trips/${tripId}/budget`,
     },
     {
       Icon: MapPin,
       label: 'Spot',
-      href: `/trips/${tripId}/map?new=1`,
+      href: `/trips/${tripId}/map`,
     },
     {
       Icon: CalendarPlus,
       label: 'Jour',
-      href: `/trips/${tripId}/planning?new=1`,
+      href: `/trips/${tripId}/planning`,
+    },
+    {
+      Icon: Timer,
+      label: 'Session',
+      href: '/segments/new/live',
+    },
+    {
+      Icon: Vote,
+      label: 'Sondage',
+      href: `/trips/${tripId}/polls`,
+    },
+    {
+      Icon: Car,
+      label: 'Conduite',
+      href: `/trips/${tripId}/drive`,
     },
   ]
   return (
