@@ -178,7 +178,7 @@ export function MapShell({ tripId }: Props) {
       {/* Day dock flottant + transport toggle */}
       {days.length > 0 && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-          <div className="pointer-events-auto">
+          <div className="pointer-events-auto" data-tour="map-day-dock">
             <MapDayDock
               days={days}
               selectedDayId={selectedDayId}
@@ -189,7 +189,7 @@ export function MapShell({ tripId }: Props) {
             />
           </div>
           {selectedDayId !== 'all' && (
-            <div className="flex items-center justify-center gap-3 mt-2 pointer-events-auto">
+            <div className="flex items-center justify-center gap-3 mt-2 pointer-events-auto" data-tour="map-transport-toggle">
               <TransportModeToggle value={transportMode} onChange={handleTransportChange} />
               {route && (
                 <div className="bg-white/90 dark:bg-paper-dark/90 backdrop-blur rounded-full px-3 py-1.5 shadow-sm">

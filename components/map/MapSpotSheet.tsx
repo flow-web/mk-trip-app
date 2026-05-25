@@ -56,6 +56,7 @@ export function MapSpotSheet({ spots, label, onSpotClick, onSuggestAI, onOptimiz
                 <button
                   type="button"
                   onClick={onSuggestAI}
+                  data-tour="map-suggest-ai"
                   className="px-3 py-1.5 text-[11px] font-medium rounded-pill bg-black text-white flex items-center gap-1.5"
                 >
                   ✨ Suggérer

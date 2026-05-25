@@ -13,11 +13,13 @@ import { Eyebrow } from '@/components/design/Eyebrow'
 import { WeekStrip } from '@/components/planning/WeekStrip'
 import { SortableTimeline } from '@/components/planning/SortableTimeline'
 import { ImportTicketDialog } from '@/components/planning/ImportTicketDialog'
+import { usePageTour } from '@/hooks/usePageTour'
 import type { TicketExtract } from '@/lib/ai/ticketExtractSchema'
 
 export default function PlanningPage() {
   const { tripId } = useParams<{ tripId: string }>()
   const [importOpen, setImportOpen] = useState(false)
+  usePageTour('planning')
   const trip = useLiveQuery(() => db.trips.get(tripId), [tripId])
   const days =
     useLiveQuery(
@@ -140,6 +142,7 @@ export default function PlanningPage() {
             </p>
           </div>
         )}
+        <div data-tour="planning-weekstrip">
         <WeekStrip
           days={days.map((d) => ({
             id: d.id,
@@ -151,8 +154,9 @@ export default function PlanningPage() {
           onSelect={setActiveDayId}
           accent={accent}
         />
+        </div>
       </div>
-      <div className="mt-4">
+      <div className="mt-4" data-tour="planning-timeline">
         <SortableTimeline
           activities={activities.map((a) => ({
             id: a.id,
@@ -177,6 +181,7 @@ export default function PlanningPage() {
         <button
           type="button"
           onClick={() => setImportOpen(true)}
+          data-tour="planning-import"
           className="w-13 h-13 rounded-full bg-white shadow-card flex items-center justify-center border border-hairline"
         >
           <FileText className="w-5 h-5 text-ink" strokeWidth={2} />

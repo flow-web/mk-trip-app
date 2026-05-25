@@ -23,6 +23,7 @@ import { DebtFlow } from '@/components/budget/DebtFlow'
 import { CategoryTiles } from '@/components/budget/CategoryTiles'
 import { ExpenseRow } from '@/components/budget/ExpenseRow'
 import { ExpenseDialog } from '@/components/budget/ExpenseDialog'
+import { usePageTour } from '@/hooks/usePageTour'
 import type { LocalExpense } from '@/lib/db/schema'
 
 const CAT_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
@@ -40,6 +41,7 @@ const AVATAR_PALETTE = ['#C75A20', '#5A6E3E', '#1E3A5C', '#B14E32', '#3D362C']
 export default function BudgetPage() {
   const { tripId } = useParams<{ tripId: string }>()
   const [editingExpense, setEditingExpense] = useState<LocalExpense | null>(null)
+  usePageTour('budget')
 
   const trip = useLiveQuery(() => db.trips.get(tripId), [tripId])
   const expenses =
@@ -204,14 +206,14 @@ export default function BudgetPage() {
           </div>
         )}
 
-        <div className="mt-7">
+        <div className="mt-7" data-tour="budget-debts">
           <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">QUI DOIT QUOI À QUI</Eyebrow>
           <div className="mt-3">
             <DebtFlow lines={debts} onSettle={handleSettle} />
           </div>
         </div>
 
-        <div className="mt-7">
+        <div className="mt-7" data-tour="budget-categories">
           <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">PAR CATÉGORIE</Eyebrow>
           <div className="mt-3">
             <CategoryTiles tiles={tiles} />

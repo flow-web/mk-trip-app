@@ -30,6 +30,7 @@
     "clsx": "^2.1.1",
     "dexie": "^4.0.10",
     "dexie-react-hooks": "^1.1.7",
+    "driver.js": "^1.4.0",
     "lucide-react": "^0.460.0",
     "mapbox-gl": "^3.7.0",
     "next": "^16.0.0",
