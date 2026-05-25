@@ -52,5 +52,29 @@ describe('MapSpotSheet', () => {
       <MapSpotSheet spots={[]} label="Jour 2" onSpotClick={() => {}} />,
     )
     expect(screen.getByText(/aucun spot/i)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /sugg[ée]rer pour ce jour/i })).not.toBeInTheDocument()
+  })
+
+  it('renders the per-day suggest button in empty state when onSuggestAI is provided', () => {
+    render(
+      <MapSpotSheet spots={[]} label="Jour 2" onSpotClick={() => {}}
+        onSuggestAI={() => {}} />,
+    )
+    expect(screen.getByRole('button', { name: /sugg[ée]rer pour ce jour/i })).toBeInTheDocument()
+  })
+
+  it('renders the AI suggest button when onSuggestAI is provided', () => {
+    render(
+      <MapSpotSheet spots={spots as any} label="Tous" onSpotClick={() => {}}
+        onSuggestAI={() => {}} />,
+    )
+    expect(screen.getByRole('button', { name: /sugg[ée]rer/i })).toBeInTheDocument()
+  })
+
+  it('does NOT render the AI suggest button when onSuggestAI is undefined', () => {
+    render(
+      <MapSpotSheet spots={spots as any} label="Tous" onSpotClick={() => {}} />,
+    )
+    expect(screen.queryByRole('button', { name: /sugg[ée]rer/i })).not.toBeInTheDocument()
   })
 })

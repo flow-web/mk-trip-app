@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BookOpen, Calendar, Home, Map, Wallet } from 'lucide-react'
+import { BookOpen, Calendar, Home, Map, MessageSquare, Wallet } from 'lucide-react'
 import { accentFor } from '@/lib/design/accent'
 import type { Database } from '@/lib/supabase/types'
 
@@ -13,6 +13,7 @@ const TABS = [
   { id: 'map', Icon: Map, label: 'Map', suffix: 'map' },
   { id: 'plan', Icon: Calendar, label: 'Planning', suffix: 'planning' },
   { id: 'split', Icon: Wallet, label: 'Split', suffix: 'budget' },
+  { id: 'chat', Icon: MessageSquare, label: 'Chat', suffix: 'chat' },
   { id: 'guide', Icon: BookOpen, label: 'Guide', suffix: 'guide' },
 ] as const
 

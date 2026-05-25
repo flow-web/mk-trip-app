@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { BookOpen, Calendar, Home, Map, Plus, Wallet } from 'lucide-react'
+import { BookOpen, Calendar, Home, Map, MessageSquare, Plus, Wallet } from 'lucide-react'
 import { db } from '@/lib/db'
 import { accentFor } from '@/lib/design/accent'
 import { ThemeToggle } from '@/components/design/ThemeToggle'
@@ -16,6 +16,7 @@ const NAV = [
   { Icon: Map, label: 'Map', suffix: 'map' },
   { Icon: Calendar, label: 'Planning', suffix: 'planning' },
   { Icon: Wallet, label: 'Split', suffix: 'budget' },
+  { Icon: MessageSquare, label: 'Chat', suffix: 'chat' },
   { Icon: BookOpen, label: 'Guide', suffix: 'guide' },
 ] as const
 
