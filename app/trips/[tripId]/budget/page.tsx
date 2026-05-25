@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useLiveQuery } from 'dexie-react-hooks'
 import {
@@ -13,6 +14,7 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { db } from '@/lib/db'
+import { mutations } from '@/lib/db/mutations'
 import { accentFor } from '@/lib/design/accent'
 import { computeDebts } from '@/lib/utils/split-debt'
 import { TripSwitcher } from '@/components/design/TripSwitcher'
@@ -20,7 +22,8 @@ import { Eyebrow } from '@/components/design/Eyebrow'
 import { DebtFlow } from '@/components/budget/DebtFlow'
 import { CategoryTiles } from '@/components/budget/CategoryTiles'
 import { ExpenseRow } from '@/components/budget/ExpenseRow'
-import { AddExpenseDialog } from '@/components/budget/AddExpenseDialog'
+import { ExpenseDialog } from '@/components/budget/ExpenseDialog'
+import type { LocalExpense } from '@/lib/db/schema'
 
 const CAT_ICON: Record<string, { Icon: LucideIcon; color: string }> = {
   food: { Icon: UtensilsCrossed, color: '#1E3A5C' },
@@ -36,6 +39,8 @@ const AVATAR_PALETTE = ['#C75A20', '#5A6E3E', '#1E3A5C', '#B14E32', '#3D362C']
 
 export default function BudgetPage() {
   const { tripId } = useParams<{ tripId: string }>()
+  const [editingExpense, setEditingExpense] = useState<LocalExpense | null>(null)
+
   const trip = useLiveQuery(() => db.trips.get(tripId), [tripId])
   const expenses =
     useLiveQuery(() => db.expenses.where({ trip_id: tripId }).toArray(), [tripId]) ??
@@ -71,17 +76,36 @@ export default function BudgetPage() {
       share: Number(s.share),
     })),
   ).map((d) => ({
+    fromId: d.from,
     fromInitials: initialsFor(d.from),
     fromName: nameFor(d.from),
     fromColor: colorFor(d.from),
+    toId: d.to,
     toInitials: initialsFor(d.to),
     toName: nameFor(d.to),
     toColor: colorFor(d.to),
     amountCents: d.amount,
   }))
 
+  async function handleSettle(fromId: string, toId: string, amountCents: number) {
+    await mutations.expense.create(
+      {
+        trip_id: tripId,
+        payer_id: fromId,
+        amount: amountCents,
+        currency: trip!.currency ?? 'EUR',
+        category: 'settlement' as any,
+        note: `Remboursement → ${nameFor(toId)}`,
+        spent_at: new Date().toISOString(),
+        split_mode: 'equal',
+      },
+      [{ user_id: toId, share: 1 }],
+    )
+  }
+
   const byCat = new Map<string, number>()
   for (const e of expenses) {
+    if ((e.category as string) === 'settlement') continue
     byCat.set(e.category, (byCat.get(e.category) ?? 0) + e.amount)
   }
   const tiles = [...byCat.entries()].map(([cat, val]) => ({
@@ -95,6 +119,14 @@ export default function BudgetPage() {
   const sortedExpenses = expenses
     .slice()
     .sort((a, b) => +new Date(b.spent_at) - +new Date(a.spent_at))
+
+  const regularExpenses = sortedExpenses.filter((e) => (e.category as string) !== 'settlement')
+  const settlements = sortedExpenses.filter((e) => (e.category as string) === 'settlement')
+
+  const membersList = members.map((m) => ({
+    user_id: m.user_id,
+    display_name: profMap.get(m.user_id)?.display_name ?? 'XX',
+  }))
 
   return (
     <main className="min-h-screen bg-paper dark:bg-paper-dark pb-32 md:max-w-[720px] md:mx-auto">
@@ -146,7 +178,7 @@ export default function BudgetPage() {
         <div className="mt-7">
           <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">QUI DOIT QUOI À QUI</Eyebrow>
           <div className="mt-3">
-            <DebtFlow lines={debts} />
+            <DebtFlow lines={debts} onSettle={handleSettle} />
           </div>
         </div>
 
@@ -160,32 +192,68 @@ export default function BudgetPage() {
         <div className="mt-7">
           <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">DÉPENSES RÉCENTES</Eyebrow>
           <div className="mt-3">
-            {sortedExpenses.map((e) => (
-              <ExpenseRow
+            {regularExpenses.map((e) => (
+              <button
                 key={e.id}
-                payerInitials={initialsFor(e.payer_id)}
-                payerColor={colorFor(e.payer_id)}
-                label={e.note ?? e.category}
-                category={e.category}
-                amountCents={e.amount}
-                splitsCount={
-                  splits.filter((s) => s.expense_id === e.id).length
-                }
-                when={new Date(e.spent_at).toLocaleDateString('fr')}
-              />
+                type="button"
+                className="w-full text-left"
+                onClick={() => setEditingExpense(e)}
+              >
+                <ExpenseRow
+                  payerInitials={initialsFor(e.payer_id)}
+                  payerColor={colorFor(e.payer_id)}
+                  label={e.note ?? e.category}
+                  category={e.category}
+                  amountCents={e.amount}
+                  splitsCount={splits.filter((s) => s.expense_id === e.id).length}
+                  when={new Date(e.spent_at).toLocaleDateString('fr')}
+                />
+              </button>
             ))}
           </div>
         </div>
+
+        {settlements.length > 0 && (
+          <div className="mt-7">
+            <Eyebrow className="text-ink-mute dark:text-ink-mute-dark">REMBOURSEMENTS</Eyebrow>
+            <div className="mt-3">
+              {settlements.map((e) => (
+                <ExpenseRow
+                  key={e.id}
+                  payerInitials={initialsFor(e.payer_id)}
+                  payerColor={colorFor(e.payer_id)}
+                  label={e.note ?? 'Remboursement'}
+                  category="settlement"
+                  amountCents={e.amount}
+                  splitsCount={1}
+                  when={new Date(e.spent_at).toLocaleDateString('fr')}
+                  state="settled"
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      <AddExpenseDialog
+      <ExpenseDialog
         tripId={tripId}
         currency={trip.currency ?? 'EUR'}
-        members={members.map((m) => ({
-          user_id: m.user_id,
-          display_name: profMap.get(m.user_id)?.display_name ?? 'XX',
-        }))}
+        members={membersList}
       />
+
+      {editingExpense && (
+        <ExpenseDialog
+          tripId={tripId}
+          currency={trip.currency ?? 'EUR'}
+          members={membersList}
+          expense={editingExpense}
+          existingSplits={splits.filter(
+            (s) => s.expense_id === editingExpense.id,
+          )}
+          open={!!editingExpense}
+          onOpenChange={(o) => { if (!o) setEditingExpense(null) }}
+        />
+      )}
     </main>
   )
 }
