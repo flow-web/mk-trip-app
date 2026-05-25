@@ -12,6 +12,18 @@ export default async function TripsListPage() {
     <main className="min-h-screen bg-paper dark:bg-paper-dark p-6">
       <div className="mk-eyebrow text-ink-mute dark:text-ink-mute-dark">MES VOYAGES</div>
       <h1 className="mk-display text-4xl mt-3">{trips?.length ?? 0} voyage{(trips?.length ?? 0) > 1 ? 's' : ''}</h1>
+      {process.env.NEXT_PUBLIC_SEGMENTS_ENABLED === 'true' && (
+        <Link
+          href={'/segments' as any}
+          className="block rounded-md bg-ink text-paper p-5 mt-6"
+        >
+          <div className="text-xs uppercase tracking-wider opacity-80">Nouveau</div>
+          <div className="text-xl font-display font-bold mt-1">Segments GPS</div>
+          <div className="text-sm opacity-90 mt-1">
+            Crée et bats des records sur des parcours.
+          </div>
+        </Link>
+      )}
       <ul className="mt-6 space-y-2">
         {trips?.map((t) => (
           <li key={t.id}>

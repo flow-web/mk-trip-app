@@ -91,7 +91,7 @@ export default function DemoListPage() {
         })}
       </ul>
 
-      <div className="mt-10 px-6 md:px-8">
+      <div className="mt-10 mb-24 px-6 md:px-8">
         <Link
           href="/welcome"
           className="mk-mono text-[11px] text-ink-mute dark:text-ink-mute-dark underline"

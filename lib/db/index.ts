@@ -3,7 +3,7 @@ import Dexie, { type EntityTable } from 'dexie'
 import type {
   LocalProfile, LocalTrip, LocalTripMember, LocalDay, LocalActivity,
   LocalActivityCompletion, LocalSpot, LocalExpense, LocalExpenseSplit,
-  LocalChecklistItem, LocalChecklistCompletion, LocalGuideCard,
+  LocalChecklistItem, LocalChecklistCompletion, LocalGuideCard, LocalMessage,
   SyncQueueEntry, PendingUpload,
 } from './schema'
 
@@ -20,6 +20,7 @@ export class MKTripDB extends Dexie {
   checklist_items!: EntityTable<LocalChecklistItem, 'id'>
   checklist_completions!: EntityTable<LocalChecklistCompletion, 'item_id'>
   guide_cards!: EntityTable<LocalGuideCard, 'id'>
+  messages!: EntityTable<LocalMessage, 'id'>
 
   sync_queue!: EntityTable<SyncQueueEntry, 'id'>
   pending_uploads!: EntityTable<PendingUpload, 'id'>
@@ -41,6 +42,12 @@ export class MKTripDB extends Dexie {
       guide_cards: 'id, trip_id, position',
       sync_queue: 'id, status, created_at, row_id',
       pending_uploads: 'id, trip_id, status, created_at',
+    })
+    this.version(2).stores({
+      spots: 'id, trip_id, category, day_id',
+    })
+    this.version(3).stores({
+      messages: 'id, trip_id, [trip_id+created_at]',
     })
   }
 }

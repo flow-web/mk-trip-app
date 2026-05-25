@@ -15,7 +15,7 @@ export async function hydrateAllTrips() {
 
 export async function hydrateTrip(tripId: string) {
   // Tables indexed directly by trip_id
-  const tripIdTables = ['days', 'spots', 'expenses', 'checklist_items', 'guide_cards'] as const
+  const tripIdTables = ['days', 'spots', 'expenses', 'checklist_items', 'guide_cards', 'messages'] as const
   for (const table of tripIdTables) {
     const { data } = await supabase.from(table).select('*').eq('trip_id', tripId)
     if (data) await (db as any)[table].bulkPut(data)

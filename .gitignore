@@ -48,3 +48,10 @@ yarn-error.*
 out/
 .vercel
 next-env.d.ts
+.superpowers/
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+supabase/.temp/

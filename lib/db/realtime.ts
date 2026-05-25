@@ -10,7 +10,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js'
 const TABLES = [
   'trips', 'trip_members', 'days', 'activities', 'activity_completions',
   'spots', 'expenses', 'expense_splits', 'checklist_items',
-  'checklist_completions', 'guide_cards',
+  'checklist_completions', 'guide_cards', 'messages',
 ] as const
 
 type TableName = (typeof TABLES)[number]

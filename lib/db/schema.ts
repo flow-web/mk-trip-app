@@ -10,7 +10,11 @@ export type LocalRow<T> = T & {
 }
 
 export type LocalProfile = LocalRow<Tables['profiles']['Row']>
-export type LocalTrip = LocalRow<Tables['trips']['Row']>
+export type LocalTrip = LocalRow<Tables['trips']['Row']> & {
+  // Local-only flag — non synchronisé. True quand l'user a dismissé le panel
+  // de suggestions IA pour ce voyage (évite la ré-ouverture auto au mount).
+  ai_suggestions_dismissed?: boolean
+}
 export type LocalTripMember = LocalRow<Tables['trip_members']['Row']>
 // LocalDay : étendu avec `note` (souvenir/carnet de bord) — pas encore sur Supabase,
 // stocké uniquement côté Dexie pour l'instant. Sera migré quand le mode démo
@@ -29,6 +33,7 @@ export type LocalExpenseSplit = LocalRow<Tables['expense_splits']['Row']>
 export type LocalChecklistItem = LocalRow<Tables['checklist_items']['Row']>
 export type LocalChecklistCompletion = LocalRow<Tables['checklist_completions']['Row']>
 export type LocalGuideCard = LocalRow<Tables['guide_cards']['Row']>
+export type LocalMessage = LocalRow<Tables['messages']['Row']>
 
 // Sync queue entry
 export type SyncQueueOp = 'insert' | 'update' | 'delete'
