@@ -21,6 +21,7 @@ export type LocalTripMember = LocalRow<Tables['trip_members']['Row']>
 // sortira et qu'un vrai voyage aura besoin d'écrire des notes synchronisables.
 export type LocalDay = LocalRow<Tables['days']['Row']> & {
   note?: string | null
+  transport_mode?: 'driving' | 'walking' | 'cycling'
 }
 export type LocalActivity = LocalRow<Tables['activities']['Row']>
 export type LocalActivityCompletion = LocalRow<Tables['activity_completions']['Row']>

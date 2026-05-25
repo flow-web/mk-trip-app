@@ -8,12 +8,15 @@ import { mutations } from '@/lib/db/mutations'
 import { accentFor } from '@/lib/design/accent'
 import { useTripMapData } from '@/lib/map/useTripMapData'
 import { filterVisibleSpots, computeDayLines, type SelectedDayId } from '@/lib/map/spotFilters'
+import { useRouteLines } from '@/lib/map/useRouteLines'
+import { optimizeRoute } from '@/lib/map/optimizeRoute'
 import { MapDayDock } from './MapDayDock'
+import { TransportModeToggle } from './TransportModeToggle'
 import { MapSpotSheet } from './MapSpotSheet'
 import { MapSpotDetailSheet } from './MapSpotDetailSheet'
 import { AISuggestionsPanel } from '@/components/ai/AISuggestionsPanel'
 import type { AISuggestion } from '@/lib/ai/suggestSpotsSchema'
-import type { LocalTrip } from '@/lib/db/schema'
+import type { LocalTrip, LocalDay } from '@/lib/db/schema'
 
 const MapView = dynamic(
   () => import('./MapView').then((m) => m.MapView),
@@ -35,14 +38,48 @@ export function MapShell({ tripId }: Props) {
   const [selectedDayId, setSelectedDayId] = useState<SelectedDayId>('all')
   const [selectedSpotId, setSelectedSpotId] = useState<string | null>(null)
 
+  const selectedDay = useLiveQuery(
+    () => (selectedDayId !== 'all' ? db.days.get(selectedDayId) : undefined),
+    [selectedDayId],
+  )
+  const [transportMode, setTransportMode] = useState<'driving' | 'walking' | 'cycling'>('driving')
+
+  useEffect(() => {
+    if (selectedDay) {
+      setTransportMode((selectedDay as LocalDay).transport_mode ?? 'driving')
+    }
+  }, [selectedDay?.id])
+
+  const handleTransportChange = useCallback(async (mode: 'driving' | 'walking' | 'cycling') => {
+    setTransportMode(mode)
+    if (selectedDayId !== 'all') {
+      await db.days.update(selectedDayId, { transport_mode: mode } as Partial<LocalDay>)
+    }
+  }, [selectedDayId])
+
   const visibleSpots = useMemo(
     () => filterVisibleSpots(spots, selectedDayId),
     [spots, selectedDayId],
   )
-  const lines = useMemo(
+  const fallbackLines = useMemo(
     () => computeDayLines(spots, selectedDayId),
     [spots, selectedDayId],
   )
+
+  const routeSpots = useMemo(
+    () => visibleSpots.filter((s) => s.lat != null && s.lng != null).map((s) => ({
+      id: s.id, lat: s.lat!, lng: s.lng!,
+    })),
+    [visibleSpots],
+  )
+  const { route, loading: routeLoading } = useRouteLines(routeSpots, selectedDayId, transportMode)
+
+  const lines = useMemo(() => {
+    if (route && selectedDayId !== 'all') {
+      return [{ day_id: selectedDayId, coordinates: route.coordinates }]
+    }
+    return fallbackLines
+  }, [route, selectedDayId, fallbackLines])
 
   // Re-fetch full LocalSpot for detail (includes description, image_url)
   const selectedSpotFull = useLiveQuery(
@@ -58,6 +95,21 @@ export function MapShell({ tripId }: Props) {
     const dismissed = (trip as LocalTrip).ai_suggestions_dismissed === true
     if (spots.length === 0 && !dismissed) setAiPanelOpen(true)
   }, [trip, spots.length])
+
+  const [optimizing, setOptimizing] = useState(false)
+  const handleOptimize = useCallback(async () => {
+    if (routeSpots.length < 3) return
+    setOptimizing(true)
+    try {
+      const result = await optimizeRoute(routeSpots, transportMode)
+      if (result) {
+        // Reorder spots based on optimized order — no position field, just visual feedback via route
+        // The optimized route coordinates are displayed automatically via the cache
+      }
+    } finally {
+      setOptimizing(false)
+    }
+  }, [routeSpots, transportMode])
 
   const handleDismissAiPanel = useCallback(async () => {
     setAiPanelOpen(false)
@@ -112,17 +164,37 @@ export function MapShell({ tripId }: Props) {
         />
       </div>
 
-      {/* Day dock flottant */}
+      {/* Day dock flottant + transport toggle */}
       {days.length > 0 && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-          <MapDayDock
-            days={days}
-            selectedDayId={selectedDayId}
-            onSelect={(id) => {
-              setSelectedDayId(id)
-              setSelectedSpotId(null)
-            }}
-          />
+          <div className="pointer-events-auto">
+            <MapDayDock
+              days={days}
+              selectedDayId={selectedDayId}
+              onSelect={(id) => {
+                setSelectedDayId(id)
+                setSelectedSpotId(null)
+              }}
+            />
+          </div>
+          {selectedDayId !== 'all' && (
+            <div className="flex items-center justify-center gap-3 mt-2 pointer-events-auto">
+              <TransportModeToggle value={transportMode} onChange={handleTransportChange} />
+              {route && (
+                <div className="bg-white/90 dark:bg-paper-dark/90 backdrop-blur rounded-full px-3 py-1.5 shadow-sm">
+                  <span className="mk-mono text-[11px] text-ink-mute">
+                    {route.distance >= 1000
+                      ? `${(route.distance / 1000).toFixed(1)} km`
+                      : `${Math.round(route.distance)} m`}
+                    {' · '}
+                    {route.duration >= 3600
+                      ? `${Math.floor(route.duration / 3600)}h${Math.round((route.duration % 3600) / 60).toString().padStart(2, '0')}`
+                      : `${Math.round(route.duration / 60)} min`}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -132,6 +204,8 @@ export function MapShell({ tripId }: Props) {
         label={dayLabel}
         onSpotClick={setSelectedSpotId}
         onSuggestAI={AI_SUGGESTIONS_ENABLED ? () => setAiPanelOpen(true) : undefined}
+        onOptimize={selectedDayId !== 'all' && routeSpots.length >= 3 ? handleOptimize : undefined}
+        optimizing={optimizing}
       />
 
       {/* Sheet détail spot (overlay) */}
