@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Book, Flame, Sun, Wallet } from 'lucide-react'
@@ -11,10 +12,29 @@ import { TripSwitcher } from '@/components/design/TripSwitcher'
 import { Eyebrow } from '@/components/design/Eyebrow'
 import { InfoTiles } from '@/components/guide/InfoTiles'
 import { ChecklistGroup } from '@/components/guide/ChecklistGroup'
+import { ChecklistSuggestPanel } from '@/components/guide/ChecklistSuggestPanel'
 import { CrewNote } from '@/components/guide/CrewNote'
+import type { ChecklistSuggestion } from '@/lib/ai/suggestChecklistSchema'
+
+function getSeason(startDate: string | null): string {
+  if (!startDate) return 'summer'
+  const month = new Date(startDate).getMonth()
+  if (month >= 2 && month <= 4) return 'spring'
+  if (month >= 5 && month <= 7) return 'summer'
+  if (month >= 8 && month <= 10) return 'autumn'
+  return 'winter'
+}
+
+function getDurationDays(start: string | null, end: string | null): number {
+  if (!start || !end) return 7
+  const diff = (+new Date(end) - +new Date(start)) / 86_400_000
+  return Math.max(1, Math.round(diff))
+}
 
 export default function GuidePage() {
   const { tripId } = useParams<{ tripId: string }>()
+  const [suggestOpen, setSuggestOpen] = useState(false)
+
   const trip = useLiveQuery(() => db.trips.get(tripId), [tripId])
   const items =
     useLiveQuery(
@@ -34,11 +54,24 @@ export default function GuidePage() {
   const completedItemIds = new Set(completions.map((c) => c.item_id))
 
   async function toggleItem(id: string, currentlyDone: boolean) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     await mutations.checklist.toggle(id, user.id, !currentlyDone)
+  }
+
+  async function handleAcceptSuggestions(suggestions: ChecklistSuggestion[]) {
+    const maxPos = items.length > 0
+      ? Math.max(...items.map((it) => it.position)) + 1
+      : 0
+    for (let i = 0; i < suggestions.length; i++) {
+      await mutations.checklist.create({
+        trip_id: tripId,
+        label: suggestions[i].label,
+        category: suggestions[i].category,
+        position: maxPos + i,
+      })
+    }
+    setSuggestOpen(false)
   }
 
   return (
@@ -90,6 +123,39 @@ export default function GuidePage() {
             accent={accent}
             onToggle={toggleItem}
           />
+
+          {!suggestOpen && items.length === 0 && (
+            <button
+              type="button"
+              onClick={() => setSuggestOpen(true)}
+              className="mt-4 w-full py-3 rounded-md bg-ink text-white text-sm font-medium flex items-center justify-center gap-2"
+            >
+              ✨ Générer ma checklist
+            </button>
+          )}
+
+          {!suggestOpen && items.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setSuggestOpen(true)}
+              className="mt-3 text-[11px] mk-mono text-ink-mute hover:text-ink underline transition"
+            >
+              ✨ Compléter avec l'IA
+            </button>
+          )}
+
+          {suggestOpen && (
+            <ChecklistSuggestPanel
+              tripId={tripId}
+              destination={trip.destination ?? trip.name}
+              tripType={trip.trip_type ?? 'other'}
+              durationDays={getDurationDays(trip.start_date, trip.end_date)}
+              season={getSeason(trip.start_date)}
+              existingLabels={items.map((it) => it.label)}
+              onAccept={handleAcceptSuggestions}
+              onClose={() => setSuggestOpen(false)}
+            />
+          )}
         </div>
 
         {guideCards.length > 0 && (
