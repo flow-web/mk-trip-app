@@ -318,7 +318,7 @@ const lisboaExpenses: LocalExpense[] = [
   { id: `${LISBOA}-e8`, trip_id: LISBOA, payer_id: DEMO_PARTNER_ID, amount: 2400, currency: 'EUR', category: 'activity', note: 'Mosteiro Jerónimos × 2', spent_at: '2026-05-22T11:00:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
   { id: `${LISBOA}-e9`, trip_id: LISBOA, payer_id: DEMO_USER_ID, amount: 7000, currency: 'EUR', category: 'food', note: 'Cervejaria Ramiro — crevettes', spent_at: '2026-05-22T20:30:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
   { id: `${LISBOA}-e10`, trip_id: LISBOA, payer_id: DEMO_PARTNER_ID, amount: 1850, currency: 'EUR', category: 'shopping', note: 'Carreaux azulejos + bouquin', spent_at: '2026-05-22T16:00:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
-  { id: `${LISBOA}-e11`, trip_id: LISBOA, payer_id: DEMO_PARTNER_ID, amount: 4500, currency: 'EUR', category: 'settlement' as any, note: 'Remboursement → Lina', spent_at: '2026-05-23T10:00:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
+  { id: `${LISBOA}-e11`, trip_id: LISBOA, payer_id: DEMO_PARTNER_ID, amount: 4500, currency: 'EUR', category: 'settlement', note: 'Remboursement → Lina', spent_at: '2026-05-23T10:00:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
 ]
 
 const lisboaSplits: LocalExpenseSplit[] = lisboaExpenses.flatMap((e) => {

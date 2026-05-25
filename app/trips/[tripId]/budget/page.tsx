@@ -94,7 +94,7 @@ export default function BudgetPage() {
         payer_id: fromId,
         amount: amountCents,
         currency: trip!.currency ?? 'EUR',
-        category: 'settlement' as any,
+        category: 'settlement',
         note: `Remboursement → ${nameFor(toId)}`,
         spent_at: new Date().toISOString(),
         split_mode: 'equal',
@@ -105,7 +105,7 @@ export default function BudgetPage() {
 
   const byCat = new Map<string, number>()
   for (const e of expenses) {
-    if ((e.category as string) === 'settlement') continue
+    if (e.category === 'settlement') continue
     byCat.set(e.category, (byCat.get(e.category) ?? 0) + e.amount)
   }
   const tiles = [...byCat.entries()].map(([cat, val]) => ({
@@ -120,8 +120,8 @@ export default function BudgetPage() {
     .slice()
     .sort((a, b) => +new Date(b.spent_at) - +new Date(a.spent_at))
 
-  const regularExpenses = sortedExpenses.filter((e) => (e.category as string) !== 'settlement')
-  const settlements = sortedExpenses.filter((e) => (e.category as string) === 'settlement')
+  const regularExpenses = sortedExpenses.filter((e) => e.category !== 'settlement')
+  const settlements = sortedExpenses.filter((e) => e.category === 'settlement')
 
   const membersList = members.map((m) => ({
     user_id: m.user_id,

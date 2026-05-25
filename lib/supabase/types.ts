@@ -1815,6 +1815,7 @@ export type Database = {
         | "drink"
         | "shopping"
         | "other"
+        | "settlement"
       guide_kind:
         | "danger"
         | "warning"
@@ -1984,6 +1985,7 @@ export const Constants = {
         "drink",
         "shopping",
         "other",
+        "settlement",
       ],
       guide_kind: ["danger", "warning", "info", "weather", "emergency", "food"],
       member_role: ["owner", "editor", "viewer"],
@@ -2001,3 +2003,4 @@ export const Constants = {
     },
   },
 } as const
+
