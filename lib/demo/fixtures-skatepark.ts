@@ -424,6 +424,7 @@ export const skateparkSpots: LocalSpot[] = [
   {
     id: `${SK}-s1`,
     trip_id: SK,
+    day_id: null,
     name: 'Skatepark de la Barre — Anglet',
     description: 'Bowl historique bétonné, gratuit, ouvert 24h. Vent marin, ambiance unique.',
     category: 'sport',
@@ -438,6 +439,7 @@ export const skateparkSpots: LocalSpot[] = [
   {
     id: `${SK}-s2`,
     trip_id: SK,
+    day_id: null,
     name: 'Boardriders HQ Campus — Anglet',
     description: 'Campus Quiksilver/Roxy, outlet shop, architecture bois et métal. Incontournable.',
     category: 'activity',
@@ -452,6 +454,7 @@ export const skateparkSpots: LocalSpot[] = [
   {
     id: `${SK}-s3`,
     trip_id: SK,
+    day_id: null,
     name: 'Plage des Cavaliers — Anglet',
     description: 'Une des 11 plages d\'Anglet. Moins fréquentée que la Chambre d\'Amour, parfaite pour poser.',
     category: 'nature',
@@ -466,6 +469,7 @@ export const skateparkSpots: LocalSpot[] = [
   {
     id: `${SK}-s4`,
     trip_id: SK,
+    day_id: null,
     name: 'Skatepark de Hossegor',
     description: 'Rue du Pic du Midi. Street course + mini-ramp en bois abrité. Béton granuleux.',
     category: 'sport',
@@ -480,6 +484,7 @@ export const skateparkSpots: LocalSpot[] = [
   {
     id: `${SK}-s5`,
     trip_id: SK,
+    day_id: null,
     name: 'Skatepark de Capbreton',
     description: 'Bowl en béton lisse, 2m40 de profondeur. Ambiance locale, copains du coin.',
     category: 'sport',
@@ -494,6 +499,7 @@ export const skateparkSpots: LocalSpot[] = [
   {
     id: `${SK}-s6`,
     trip_id: SK,
+    day_id: null,
     name: 'Skatepark de Mimizan',
     description: 'Spot underrated des Landes. Deux bowls imbriqués, revêtement parfait.',
     category: 'sport',
@@ -508,6 +514,7 @@ export const skateparkSpots: LocalSpot[] = [
   {
     id: `${SK}-s7`,
     trip_id: SK,
+    day_id: null,
     name: 'Lac de Biscarrosse-Plage',
     description: 'Lac landais, baignade agréable, plage de sable fin. Récupération active.',
     category: 'nature',
@@ -522,6 +529,7 @@ export const skateparkSpots: LocalSpot[] = [
   {
     id: `${SK}-s8`,
     trip_id: SK,
+    day_id: null,
     name: 'Skatepark de Biscarrosse',
     description: 'Refait en 2024. Full street layout : escalier 5 marches, ledges marble, rail kink.',
     category: 'sport',
@@ -536,6 +544,7 @@ export const skateparkSpots: LocalSpot[] = [
   {
     id: `${SK}-s9`,
     trip_id: SK,
+    day_id: null,
     name: 'Skatepark des Quais — Bordeaux',
     description: 'Spot légendaire en bord de Garonne. Bowl + modules street. Vue sur le fleuve.',
     category: 'sport',
@@ -550,6 +559,7 @@ export const skateparkSpots: LocalSpot[] = [
   {
     id: `${SK}-s10`,
     trip_id: SK,
+    day_id: null,
     name: 'Darwin Bordeaux — Bowl Indoor',
     description: 'Ancienne caserne Niel reconvertie. Skatepark couvert, brasserie, marché bio le week-end.',
     category: 'sport',
@@ -564,6 +574,7 @@ export const skateparkSpots: LocalSpot[] = [
   {
     id: `${SK}-s11`,
     trip_id: SK,
+    day_id: null,
     name: 'Yakuza Skateshop — Bordeaux',
     description: 'LA référence du skate bordelais. Decks indépendants, trucks Indy, hardware complet.',
     category: 'activity',
@@ -578,6 +589,7 @@ export const skateparkSpots: LocalSpot[] = [
   {
     id: `${SK}-s12`,
     trip_id: SK,
+    day_id: null,
     name: 'Marché des Capucins — Bordeaux',
     description: 'Le ventre de Bordeaux. Huîtres, saucissons, fromages. Vin blanc debout, 10h du mat.',
     category: 'food',
