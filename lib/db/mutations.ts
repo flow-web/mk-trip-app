@@ -102,6 +102,14 @@ export const mutations = {
     },
   },
   activity: {
+    reorder: async (dayId: string, orderedIds: string[]) => {
+      for (let i = 0; i < orderedIds.length; i++) {
+        await localUpdate('activities', orderedIds[i], { position: i })
+      }
+    },
+    moveToDay: async (activityId: string, newDayId: string, position: number) => {
+      await localUpdate('activities', activityId, { day_id: newDayId, position })
+    },
     toggleCompletion: async (activityId: string, userId: string, done: boolean) => {
       if (done) {
         await localInsert('activity_completions', {
