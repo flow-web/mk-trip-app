@@ -31,7 +31,7 @@ export function ChatInput({ tripId, userId }: ChatInputProps) {
   }
 
   return (
-    <div className="border-t border-hairline dark:border-hairline-dark px-4 py-3 flex items-end gap-2">
+    <div data-tour="chat-input" className="border-t border-hairline dark:border-hairline-dark px-4 py-3 flex items-end gap-2">
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}

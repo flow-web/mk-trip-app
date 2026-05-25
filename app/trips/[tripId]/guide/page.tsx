@@ -14,6 +14,7 @@ import { InfoTiles } from '@/components/guide/InfoTiles'
 import { ChecklistGroup } from '@/components/guide/ChecklistGroup'
 import { ChecklistSuggestPanel } from '@/components/guide/ChecklistSuggestPanel'
 import { CrewNote } from '@/components/guide/CrewNote'
+import { usePageTour } from '@/hooks/usePageTour'
 import type { ChecklistSuggestion } from '@/lib/ai/suggestChecklistSchema'
 
 function getSeason(startDate: string | null): string {
@@ -34,6 +35,7 @@ function getDurationDays(start: string | null, end: string | null): number {
 export default function GuidePage() {
   const { tripId } = useParams<{ tripId: string }>()
   const [suggestOpen, setSuggestOpen] = useState(false)
+  usePageTour('guide')
 
   const trip = useLiveQuery(() => db.trips.get(tripId), [tripId])
   const items =
@@ -113,7 +115,7 @@ export default function GuidePage() {
           />
         </div>
 
-        <div className="mt-7">
+        <div className="mt-7" data-tour="guide-checklist">
           <ChecklistGroup
             items={items.map((it) => ({
               id: it.id,
@@ -128,6 +130,7 @@ export default function GuidePage() {
             <button
               type="button"
               onClick={() => setSuggestOpen(true)}
+              data-tour="guide-checklist-ai"
               className="mt-4 w-full py-3 rounded-md bg-ink text-white text-sm font-medium flex items-center justify-center gap-2"
             >
               ✨ Générer ma checklist

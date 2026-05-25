@@ -38,7 +38,7 @@ export function CreatePollDialog({ onSubmit }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="fixed bottom-[88px] left-5 right-5 h-12 rounded-pill bg-ink text-white flex items-center justify-center gap-2 shadow-card font-semibold">
+      <DialogTrigger data-tour="polls-create" className="fixed bottom-[88px] left-5 right-5 h-12 rounded-pill bg-ink text-white flex items-center justify-center gap-2 shadow-card font-semibold">
         <Plus className="w-4 h-4" strokeWidth={2} />
         Nouveau sondage
       </DialogTrigger>

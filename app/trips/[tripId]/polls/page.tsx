@@ -10,9 +10,11 @@ import { TripSwitcher } from '@/components/design/TripSwitcher'
 import { Eyebrow } from '@/components/design/Eyebrow'
 import { PollCard } from '@/components/polls/PollCard'
 import { CreatePollDialog } from '@/components/polls/CreatePollDialog'
+import { usePageTour } from '@/hooks/usePageTour'
 
 export default function PollsPage() {
   const { tripId } = useParams<{ tripId: string }>()
+  usePageTour('polls')
   const trip = useLiveQuery(() => db.trips.get(tripId), [tripId])
   const polls = useLiveQuery(
     () => db.polls.where({ trip_id: tripId }).toArray(),

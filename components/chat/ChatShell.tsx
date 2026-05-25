@@ -2,6 +2,7 @@
 
 import { MessageList } from './MessageList'
 import { ChatInput } from './ChatInput'
+import { usePageTour } from '@/hooks/usePageTour'
 
 interface ChatShellProps {
   tripId: string
@@ -9,6 +10,7 @@ interface ChatShellProps {
 }
 
 export function ChatShell({ tripId, currentUserId }: ChatShellProps) {
+  usePageTour('chat')
   return (
     <div className="flex flex-col h-[calc(100dvh-5rem)] md:h-dvh">
       <div className="px-4 py-3 border-b border-hairline dark:border-hairline-dark">

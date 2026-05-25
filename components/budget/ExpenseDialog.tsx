@@ -193,7 +193,7 @@ export function ExpenseDialog({
   }
 
   const trigger = !isEdit ? (
-    <DialogTrigger className="fixed bottom-[88px] left-5 right-5 h-12 rounded-pill bg-ink text-white flex items-center justify-center gap-2 shadow-card font-semibold">
+    <DialogTrigger data-tour="budget-add" className="fixed bottom-[88px] left-5 right-5 h-12 rounded-pill bg-ink text-white flex items-center justify-center gap-2 shadow-card font-semibold">
       <Plus className="w-4 h-4" strokeWidth={2} />
       Ajouter une dépense
     </DialogTrigger>

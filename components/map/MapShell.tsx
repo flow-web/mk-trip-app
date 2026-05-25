@@ -18,6 +18,7 @@ import { MapSpotDetailSheet } from './MapSpotDetailSheet'
 import { AISuggestionsPanel } from '@/components/ai/AISuggestionsPanel'
 import type { AISuggestion } from '@/lib/ai/suggestSpotsSchema'
 import { useStravaActivities } from '@/lib/strava/useStravaActivities'
+import { usePageTour } from '@/hooks/usePageTour'
 import type { LocalTrip, LocalDay } from '@/lib/db/schema'
 
 const MapView = dynamic(
@@ -35,6 +36,7 @@ interface Props {
 }
 
 export function MapShell({ tripId }: Props) {
+  usePageTour('map')
   const trip = useLiveQuery(() => db.trips.get(tripId), [tripId])
   const { days, spots } = useTripMapData(tripId)
   const { activities: stravaActivities } = useStravaActivities(tripId)
