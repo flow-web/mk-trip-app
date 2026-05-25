@@ -11,7 +11,7 @@ import { supabase } from '@/lib/supabase/client'
 import { TripSwitcher } from '@/components/design/TripSwitcher'
 import { Eyebrow } from '@/components/design/Eyebrow'
 import { WeekStrip } from '@/components/planning/WeekStrip'
-import { Timeline } from '@/components/planning/Timeline'
+import { SortableTimeline } from '@/components/planning/SortableTimeline'
 
 export default function PlanningPage() {
   const { tripId } = useParams<{ tripId: string }>()
@@ -45,11 +45,21 @@ export default function PlanningPage() {
   const accent = accentFor(trip.trip_type)
 
   async function toggleActivity(id: string, currentlyDone: boolean) {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
     await mutations.activity.toggleCompletion(id, user.id, !currentlyDone)
+  }
+
+  async function handleReorder(orderedIds: string[]) {
+    await mutations.activity.reorder(day!.id, orderedIds)
+  }
+
+  async function handleMoveToDay(activityId: string, newDayId: string) {
+    const targetActivities = await db.activities
+      .where({ day_id: newDayId })
+      .sortBy('position')
+    const newPosition = targetActivities.length
+    await mutations.activity.moveToDay(activityId, newDayId, newPosition)
   }
 
   return (
@@ -113,17 +123,27 @@ export default function PlanningPage() {
           accent={accent}
         />
       </div>
-      <Timeline
-        activities={activities.map((a) => ({
-          id: a.id,
-          time: a.time,
-          title: a.title,
-          subtitle: a.subtitle,
-          completed_at: completions.get(a.id) ?? null,
-        }))}
-        accent={accent}
-        onToggleActivity={toggleActivity}
-      />
+      <div className="mt-4">
+        <SortableTimeline
+          activities={activities.map((a) => ({
+            id: a.id,
+            time: a.time,
+            title: a.title,
+            subtitle: a.subtitle,
+            completed_at: completions.get(a.id) ?? null,
+          }))}
+          accent={accent}
+          onToggleActivity={toggleActivity}
+          onReorder={handleReorder}
+          onMoveToDay={handleMoveToDay}
+          days={days.map((d) => ({
+            id: d.id,
+            day_number: d.day_number,
+            date: d.date,
+          }))}
+          activeDayId={day.id}
+        />
+      </div>
       <button
         type="button"
         className="fixed bottom-[88px] right-5 w-13 h-13 rounded-full bg-ink shadow-card flex items-center justify-center"
