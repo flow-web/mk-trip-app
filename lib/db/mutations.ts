@@ -155,10 +155,77 @@ export const mutations = {
   spot: {
     create: (data: InsertWithTempId<Tables['spots']['Insert']>) => localInsert('spots', data),
     delete: (id: string) => localDelete('spots', id),
+    update: (id: string, patch: Partial<Tables['spots']['Update']>) => localUpdate('spots', id, patch),
+    checkin: async (spotId: string, userId: string) => {
+      await localInsert('spot_checkins', {
+        spot_id: spotId,
+        user_id: userId,
+        checked_in_at: new Date().toISOString(),
+      })
+    },
+    uncheckIn: async (spotId: string, userId: string) => {
+      await db.spot_checkins.delete([spotId, userId] as any)
+      await enqueue({
+        op: 'delete',
+        table: 'spot_checkins',
+        payload: { spot_id: spotId, user_id: userId },
+        row_id: spotId,
+        composite_keys: { spot_id: spotId, user_id: userId },
+      })
+      flush()
+    },
   },
   message: {
     create: (data: InsertWithTempId<Tables['messages']['Insert']>) =>
       localInsert('messages', data),
     delete: (id: string) => localDelete('messages', id),
+  },
+  poll: {
+    create: async (
+      tripId: string,
+      createdBy: string,
+      question: string,
+      options: string[],
+    ) => {
+      const { id: pollId, queueId } = await localInsert('polls', {
+        trip_id: tripId,
+        question,
+        created_by: createdBy,
+        closed: false,
+      })
+      for (let i = 0; i < options.length; i++) {
+        await localInsert('poll_options', {
+          poll_id: pollId,
+          label: options[i],
+          position: i,
+        }, [queueId])
+      }
+      return { id: pollId }
+    },
+    vote: async (pollId: string, userId: string, optionId: string) => {
+      const existing = await db.poll_votes.get([pollId, userId] as any)
+      if (existing) {
+        await db.poll_votes.update([pollId, userId] as any, {
+          option_id: optionId,
+          voted_at: new Date().toISOString(),
+        })
+        await enqueue({
+          op: 'update',
+          table: 'poll_votes',
+          payload: { option_id: optionId, voted_at: new Date().toISOString() },
+          row_id: pollId,
+          composite_keys: { poll_id: pollId, user_id: userId },
+        })
+        flush()
+      } else {
+        await localInsert('poll_votes', {
+          poll_id: pollId,
+          user_id: userId,
+          option_id: optionId,
+          voted_at: new Date().toISOString(),
+        })
+      }
+    },
+    close: (pollId: string) => localUpdate('polls', pollId, { closed: true }),
   },
 }

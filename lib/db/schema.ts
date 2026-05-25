@@ -36,6 +36,38 @@ export type LocalChecklistCompletion = LocalRow<Tables['checklist_completions'][
 export type LocalGuideCard = LocalRow<Tables['guide_cards']['Row']>
 export type LocalMessage = LocalRow<Tables['messages']['Row']>
 
+// Polls
+export interface LocalPoll {
+  id: string
+  trip_id: string
+  question: string
+  created_by: string
+  closed: boolean
+  created_at: string
+  updated_at: string
+  _pending_mutation_id?: string | null
+  _local_updated_at?: number
+}
+export interface LocalPollOption {
+  id: string
+  poll_id: string
+  label: string
+  position: number
+}
+export interface LocalPollVote {
+  poll_id: string
+  user_id: string
+  option_id: string
+  voted_at: string
+}
+
+// Spot check-ins
+export interface LocalSpotCheckin {
+  spot_id: string
+  user_id: string
+  checked_in_at: string
+}
+
 // Sync queue entry
 export type SyncQueueOp = 'insert' | 'update' | 'delete'
 export type SyncQueueStatus = 'pending' | 'sending' | 'failed'

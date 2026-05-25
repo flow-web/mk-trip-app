@@ -4,6 +4,7 @@ import type {
   LocalProfile, LocalTrip, LocalTripMember, LocalDay, LocalActivity,
   LocalActivityCompletion, LocalSpot, LocalExpense, LocalExpenseSplit,
   LocalChecklistItem, LocalChecklistCompletion, LocalGuideCard, LocalMessage,
+  LocalPoll, LocalPollOption, LocalPollVote, LocalSpotCheckin,
   SyncQueueEntry, PendingUpload,
 } from './schema'
 
@@ -21,6 +22,11 @@ export class MKTripDB extends Dexie {
   checklist_completions!: EntityTable<LocalChecklistCompletion, 'item_id'>
   guide_cards!: EntityTable<LocalGuideCard, 'id'>
   messages!: EntityTable<LocalMessage, 'id'>
+
+  polls!: EntityTable<LocalPoll, 'id'>
+  poll_options!: EntityTable<LocalPollOption, 'id'>
+  poll_votes!: EntityTable<LocalPollVote, 'poll_id'>
+  spot_checkins!: EntityTable<LocalSpotCheckin, 'spot_id'>
 
   sync_queue!: EntityTable<SyncQueueEntry, 'id'>
   pending_uploads!: EntityTable<PendingUpload, 'id'>
@@ -48,6 +54,12 @@ export class MKTripDB extends Dexie {
     })
     this.version(3).stores({
       messages: 'id, trip_id, [trip_id+created_at]',
+    })
+    this.version(4).stores({
+      polls: 'id, trip_id',
+      poll_options: 'id, poll_id',
+      poll_votes: '[poll_id+user_id], poll_id, option_id',
+      spot_checkins: '[spot_id+user_id], spot_id, user_id',
     })
   }
 }
