@@ -26,7 +26,11 @@ function getPhotos(tripId: string): Photo[] {
 }
 
 function savePhotos(tripId: string, photos: Photo[]) {
-  localStorage.setItem(`${STORAGE_PREFIX}${tripId}`, JSON.stringify(photos))
+  try {
+    localStorage.setItem(`${STORAGE_PREFIX}${tripId}`, JSON.stringify(photos))
+  } catch {
+    // localStorage full — silently fail, data stays in state only
+  }
 }
 
 export default function AlbumPage() {
@@ -59,6 +63,8 @@ export default function AlbumPage() {
   }
 
   function removePhoto(id: string) {
+    const photo = photos.find((p) => p.id === id)
+    if (photo?.url.startsWith('blob:')) URL.revokeObjectURL(photo.url)
     const updated = photos.filter((p) => p.id !== id)
     setPhotos(updated)
     savePhotos(tripId, updated)

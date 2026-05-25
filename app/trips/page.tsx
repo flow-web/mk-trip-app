@@ -6,9 +6,11 @@ type Trip = Database['public']['Tables']['trips']['Row']
 
 function tripStatus(t: Trip): 'past' | 'active' | 'upcoming' | 'draft' {
   if (!t.start_date || !t.end_date) return 'draft'
-  const now = new Date()
-  if (now > new Date(t.end_date)) return 'past'
-  if (now >= new Date(t.start_date)) return 'active'
+  const today = new Date().toISOString().slice(0, 10)
+  const start = t.start_date.slice(0, 10)
+  const end = t.end_date.slice(0, 10)
+  if (today > end) return 'past'
+  if (today >= start) return 'active'
   return 'upcoming'
 }
 

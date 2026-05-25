@@ -24,6 +24,8 @@ export default function ConvoyPage() {
   const trip = useLiveQuery(() => db.trips.get(tripId), [tripId])
   const profiles = useLiveQuery(() => db.profiles.toArray(), []) ?? []
   const profMap = new Map(profiles.map((p) => [p.id, p]))
+  const profMapRef = useRef(profMap)
+  profMapRef.current = profMap
 
   const [positions, setPositions] = useState<Map<string, MemberPosition>>(new Map())
   const [myPosition, setMyPosition] = useState<{ lat: number; lng: number } | null>(null)
@@ -42,7 +44,7 @@ export default function ConvoyPage() {
         const next = new Map(prev)
         next.set(p.userId, {
           userId: p.userId,
-          name: profMap.get(p.userId)?.display_name ?? '?',
+          name: profMapRef.current.get(p.userId)?.display_name ?? '?',
           lat: p.lat,
           lng: p.lng,
           updatedAt: Date.now(),
@@ -54,8 +56,20 @@ export default function ConvoyPage() {
     channel.subscribe()
     channelRef.current = channel
 
+    const pruneInterval = setInterval(() => {
+      setPositions((prev) => {
+        const now = Date.now()
+        const next = new Map(prev)
+        for (const [key, val] of next) {
+          if (now - val.updatedAt > 60_000) next.delete(key)
+        }
+        return next
+      })
+    }, 30_000)
+
     return () => {
       channel.unsubscribe()
+      clearInterval(pruneInterval)
     }
   }, [tripId])
 

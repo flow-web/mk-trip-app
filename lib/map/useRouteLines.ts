@@ -61,6 +61,7 @@ export function useRouteLines(
   const [route, setRoute] = useState<RouteLine | null>(null)
   const [loading, setLoading] = useState(false)
   const abortRef = useRef(0)
+  const spotsKey = spots.map((s) => s.id).join(',')
 
   useEffect(() => {
     if (dayId === 'all' || spots.length < 2) {
@@ -77,7 +78,8 @@ export function useRouteLines(
         setLoading(false)
       }
     })
-  }, [spots.map((s) => s.id).join(','), dayId, profile])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spotsKey, dayId, profile])
 
   return { route, loading }
 }

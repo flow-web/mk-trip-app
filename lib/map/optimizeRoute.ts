@@ -33,10 +33,10 @@ export async function optimizeRoute(
     const trip = data.trips?.[0]
     if (!trip) return null
 
-    const waypoints: Array<{ waypoint_index: number }> = data.waypoints ?? []
+    const waypoints: Array<{ waypoint_index: number; original_index?: number }> = (data.waypoints ?? []).map((wp: any, i: number) => ({ ...wp, original_index: i }))
     const orderedSpotIds = waypoints
       .sort((a, b) => a.waypoint_index - b.waypoint_index)
-      .map((wp, i) => spots[waypoints.indexOf(wp)]?.id)
+      .map((wp) => spots[wp.original_index!]?.id)
       .filter(Boolean) as string[]
 
     return {
