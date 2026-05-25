@@ -314,16 +314,28 @@ const lisboaExpenses: LocalExpense[] = [
   { id: `${LISBOA}-e4`, trip_id: LISBOA, payer_id: DEMO_PARTNER_ID, amount: 850, currency: 'EUR', category: 'food', note: 'Bicas + pastéis', spent_at: '2026-05-21T09:00:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
   { id: `${LISBOA}-e5`, trip_id: LISBOA, payer_id: DEMO_USER_ID, amount: 600, currency: 'EUR', category: 'transport', note: 'Tickets tram 28 × 2', spent_at: '2026-05-21T10:45:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
   { id: `${LISBOA}-e6`, trip_id: LISBOA, payer_id: DEMO_PARTNER_ID, amount: 2800, currency: 'EUR', category: 'food', note: 'Time Out · plats', spent_at: '2026-05-21T13:30:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
-  { id: `${LISBOA}-e7`, trip_id: LISBOA, payer_id: DEMO_USER_ID, amount: 9000, currency: 'EUR', category: 'activity', note: 'Soirée fado Mesa de Frades', spent_at: '2026-05-21T19:00:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
+  { id: `${LISBOA}-e7`, trip_id: LISBOA, payer_id: DEMO_USER_ID, amount: 9000, currency: 'EUR', category: 'activity', note: 'Soirée fado Mesa de Frades', spent_at: '2026-05-21T19:00:00Z', split_mode: 'custom', created_at: NOW, updated_at: NOW },
   { id: `${LISBOA}-e8`, trip_id: LISBOA, payer_id: DEMO_PARTNER_ID, amount: 2400, currency: 'EUR', category: 'activity', note: 'Mosteiro Jerónimos × 2', spent_at: '2026-05-22T11:00:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
   { id: `${LISBOA}-e9`, trip_id: LISBOA, payer_id: DEMO_USER_ID, amount: 7000, currency: 'EUR', category: 'food', note: 'Cervejaria Ramiro — crevettes', spent_at: '2026-05-22T20:30:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
   { id: `${LISBOA}-e10`, trip_id: LISBOA, payer_id: DEMO_PARTNER_ID, amount: 1850, currency: 'EUR', category: 'shopping', note: 'Carreaux azulejos + bouquin', spent_at: '2026-05-22T16:00:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
+  { id: `${LISBOA}-e11`, trip_id: LISBOA, payer_id: DEMO_PARTNER_ID, amount: 4500, currency: 'EUR', category: 'settlement' as any, note: 'Remboursement → Lina', spent_at: '2026-05-23T10:00:00Z', split_mode: 'equal', created_at: NOW, updated_at: NOW },
 ]
 
-const lisboaSplits: LocalExpenseSplit[] = lisboaExpenses.flatMap((e) => [
-  { expense_id: e.id, user_id: DEMO_USER_ID, share: 0.5 },
-  { expense_id: e.id, user_id: DEMO_PARTNER_ID, share: 0.5 },
-])
+const lisboaSplits: LocalExpenseSplit[] = lisboaExpenses.flatMap((e) => {
+  if (e.id === `${LISBOA}-e7`) {
+    return [
+      { expense_id: e.id, user_id: DEMO_USER_ID, share: 0.6 },
+      { expense_id: e.id, user_id: DEMO_PARTNER_ID, share: 0.4 },
+    ]
+  }
+  if (e.id === `${LISBOA}-e11`) {
+    return [{ expense_id: e.id, user_id: DEMO_USER_ID, share: 1 }]
+  }
+  return [
+    { expense_id: e.id, user_id: DEMO_USER_ID, share: 0.5 },
+    { expense_id: e.id, user_id: DEMO_PARTNER_ID, share: 0.5 },
+  ]
+})
 
 const lisboaChecklist: LocalChecklistItem[] = [
   { id: `${LISBOA}-c1`, trip_id: LISBOA, label: 'Passeports + photos secours', category: 'docs', position: 0, created_at: NOW, updated_at: NOW },
