@@ -102,6 +102,7 @@ export const mutations = {
     },
   },
   activity: {
+    create: (data: InsertWithTempId<Tables['activities']['Insert']>) => localInsert('activities', data),
     reorder: async (dayId: string, orderedIds: string[]) => {
       for (let i = 0; i < orderedIds.length; i++) {
         await localUpdate('activities', orderedIds[i], { position: i })

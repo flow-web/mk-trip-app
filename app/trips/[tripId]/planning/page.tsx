@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Plus } from 'lucide-react'
+import { Plus, FileText } from 'lucide-react'
 import { db } from '@/lib/db'
 import { accentFor } from '@/lib/design/accent'
 import { mutations } from '@/lib/db/mutations'
@@ -12,9 +12,12 @@ import { TripSwitcher } from '@/components/design/TripSwitcher'
 import { Eyebrow } from '@/components/design/Eyebrow'
 import { WeekStrip } from '@/components/planning/WeekStrip'
 import { SortableTimeline } from '@/components/planning/SortableTimeline'
+import { ImportTicketDialog } from '@/components/planning/ImportTicketDialog'
+import type { TicketExtract } from '@/lib/ai/ticketExtractSchema'
 
 export default function PlanningPage() {
   const { tripId } = useParams<{ tripId: string }>()
+  const [importOpen, setImportOpen] = useState(false)
   const trip = useLiveQuery(() => db.trips.get(tripId), [tripId])
   const days =
     useLiveQuery(
@@ -60,6 +63,32 @@ export default function PlanningPage() {
       .sortBy('position')
     const newPosition = targetActivities.length
     await mutations.activity.moveToDay(activityId, newDayId, newPosition)
+  }
+
+  async function handleImportTicket(ticket: TicketExtract) {
+    const matchDay = days.find((d) => d.date === ticket.date)
+    const targetDayId = matchDay?.id ?? days[0]?.id
+    if (!targetDayId) return
+
+    const existingActivities = await db.activities
+      .where({ day_id: targetDayId })
+      .sortBy('position')
+
+    const typeLabels: Record<string, string> = {
+      flight: 'Vol', train: 'Train', hotel: 'Hôtel',
+      car_rental: 'Location voiture', other: 'Transport',
+    }
+    const title = `${typeLabels[ticket.type] ?? ticket.type} ${ticket.departure} → ${ticket.arrival}`
+    const subtitle = [ticket.carrier, ticket.reference].filter(Boolean).join(' · ') || null
+
+    await mutations.activity.create({
+      day_id: targetDayId,
+      time: ticket.time ? `${ticket.time}:00` : null,
+      title,
+      subtitle,
+      category: 'activity' as any,
+      position: existingActivities.length,
+    })
   }
 
   return (
@@ -144,12 +173,27 @@ export default function PlanningPage() {
           activeDayId={day.id}
         />
       </div>
-      <button
-        type="button"
-        className="fixed bottom-[88px] right-5 w-13 h-13 rounded-full bg-ink shadow-card flex items-center justify-center"
-      >
-        <Plus className="w-5 h-5 text-white" strokeWidth={2} />
-      </button>
+      <div className="fixed bottom-[88px] right-5 flex gap-2">
+        <button
+          type="button"
+          onClick={() => setImportOpen(true)}
+          className="w-13 h-13 rounded-full bg-white shadow-card flex items-center justify-center border border-hairline"
+        >
+          <FileText className="w-5 h-5 text-ink" strokeWidth={2} />
+        </button>
+        <button
+          type="button"
+          className="w-13 h-13 rounded-full bg-ink shadow-card flex items-center justify-center"
+        >
+          <Plus className="w-5 h-5 text-white" strokeWidth={2} />
+        </button>
+      </div>
+
+      <ImportTicketDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onAccept={handleImportTicket}
+      />
     </main>
   )
 }
